@@ -18,37 +18,30 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-
 #import "chipmunk.h"
-#include <sys/time.h>
 
-@class CocosNode;
-/** Base class for actions
- */
-@interface Action : NSObject <NSCopying> {
-	CocosNode *target;	
-}
+//! RGBA color composed of bytes
+typedef struct sColorB
+{
+	char r;
+	char g;
+	char b;
+	char a;
+} Color;
 
-@property (readwrite,retain) CocosNode *target;
+//! RGBA color composed of floats
+typedef struct sColorF {
+	float r;
+	float g;
+	float b;
+	float a;
+} ColorF;
 
-+(id) action;
--(id) init;
+typedef struct sVtxPointSprite
+{
+	float x;
+	float y;
+	float size;
+} VtxPointSprite;
+		
 
--(id) copyWithZone: (NSZone*) zone;
-
-//! called before the action start
--(void) start;
-//! return YES if the action has finished
--(BOOL) isDone;
-//! called after the action has finished
--(void) stop;
--(void) step;
-//! called once per frame. time a value between 0 and 1
-//! For example: 
-//! * 0 means that the action just started
-//! * 0.5 means that the action is in the middle
-//! * 1 means that the action is over
--(void) update: (double) time;
-
-@end
