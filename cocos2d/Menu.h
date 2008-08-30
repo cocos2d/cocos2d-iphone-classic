@@ -29,22 +29,9 @@
 	int selectedItem;
 }
 
-/** sets the menu y offset */
-+(void) setOffsetY:(int)y;
-
-/** get the menu y offset */
-+(int) offsetY;
-
 /** creates a menu with it's items */
 + (id) menuWithItems: (MenuItem*) item, ... NS_REQUIRES_NIL_TERMINATION;
 
 /** initializes a menu with it's items */
 - (id) initWithItems: (MenuItem*) item vaList: (va_list) args;
-
-/** align items */
--(void) alignItems;
-
-/** if a point in inside an item, in returns the item */
--(id) itemInPoint: (CGPoint) p idx:(int*)idx;
-
 @end
