@@ -1,5 +1,6 @@
 version 0.6.2 -
  . License: removed "GNU LGPL" from sources files (issue #115)
+ . Demos: shows how to set multiple Touches and other options (issue #116)
 
 version 0.6.1 - 08-Dec-2008
  . Documentation: Generation of doc fixes (issue #105)

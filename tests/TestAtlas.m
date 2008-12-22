@@ -13,6 +13,7 @@ static NSString *transitions[] = {
 			@"Atlas1",
 			@"Atlas2",
 			@"Atlas3",
+			@"Atlas4",
 };
 
 Class nextAction()
@@ -114,6 +115,8 @@ Class restartAction()
 	if( ![super init] )
 		return nil;
 	
+	[[Director sharedDirector] setLandscape: YES];
+
 	textureAtlas = [[TextureAtlas textureAtlasWithFile: @"atlastest.png" capacity:3] retain];
 
 	ccQuad2 texCoords[] = {
@@ -171,6 +174,8 @@ Class restartAction()
 	if( ![super init] )
 		return nil;
 	
+	[[Director sharedDirector] setLandscape: YES];
+
 	label = [LabelAtlas labelAtlasWithString:@"123 Test" charMapFile:@"tuffy_bold_italic-charmap.png" itemWidth:48 itemHeight:64 startCharMap:' '];
 	
 	[self add:label];
@@ -210,6 +215,8 @@ Class restartAction()
 	if( ![super init] )
 		return nil;
 	
+	[[Director sharedDirector] setLandscape: YES];
+
 	TileMapAtlas *tilemap = [TileMapAtlas tileMapAtlasWithTileFile:@"tiles.png" mapFile:@"levelmap.tga" tileWidth:16 tileHeight:16];
 	[self add:tilemap];
 	
@@ -238,8 +245,31 @@ Class restartAction()
 {
 	return @"Atlas: TileMapAtlas";
 }
-
 @end
+
+@implementation Atlas4
+-(id) init
+{
+
+	[[Director sharedDirector] setLandscape: NO];
+
+    self = [super init];
+    if (self != nil) {
+		TileMapAtlas *tilemap = [TileMapAtlas
+									tileMapAtlasWithTileFile:@"tiles-124.png"								 
+									mapFile:@"level-124.tga"
+									tileWidth:40 tileHeight:40];
+		[self add:tilemap];
+    }
+	return self;
+}
+
+-(NSString *) title
+{
+	return @"Atlas: TileMapAtlas issue #124";
+}
+@end
+
 
 
 // CLASS IMPLEMENTATIONS
@@ -252,6 +282,10 @@ Class restartAction()
 	[[Director sharedDirector] setAnimationInterval:1.0/60];
 	[[Director sharedDirector] setDisplayFPS:YES];
 
+	// multiple touches or not ?
+//	[[Director sharedDirector] setMultipleTouchEnabled:YES];
+	
+	
 	Scene *scene = [Scene node];
 	[scene add: [nextAction() node]];
 			 
