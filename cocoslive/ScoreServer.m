@@ -14,6 +14,16 @@
 
 #import "ScoreServer.h"
 
+
+// free function used to sort
+NSInteger alphabeticSort(id string1, id string2, void *reverse)
+{
+    if ((NSInteger *)reverse == NO)
+        return [string2 localizedCaseInsensitiveCompare:string1];
+    return [string1 localizedCaseInsensitiveCompare:string2];
+}
+
+
 @interface ScoreServer (Private)
 -(void) addValue:(NSString*)value key:(NSString*)key;
 -(void) calculateHashAndAddValue:(id)value key:(NSString*)key;
@@ -64,8 +74,7 @@
     [receivedData setLength:0];
 		
 	// create the request
-//	NSMutableURLRequest *post=[NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://cocos2d.appspot.com/scores/post"]
-	NSMutableURLRequest *post=[NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://localhost:8080/post-score"]
+	NSMutableURLRequest *post=[NSMutableURLRequest requestWithURL:[NSURL URLWithString: SCORE_SERVER_URL]
 													cachePolicy:NSURLRequestUseProtocolCachePolicy
 													timeoutInterval:10.0];
 	
@@ -74,15 +83,19 @@
 	
 	CC_MD5_Init( &md5Ctx);
 
-	
-	for( id key in dict )
+	// hash SHALL be calculated in certain order
+	NSArray *keys = [dict allKeys];
+	int reverseSort = NO;
+	NSArray *sortedKeys = [keys sortedArrayUsingFunction:alphabeticSort context:&reverseSort];
+	for( id key in sortedKeys )
 		[self calculateHashAndAddValue:[dict objectForKey:key] key:key];
 
 	// device id is hashed to prevent spoofing this same score from different devices
-	[self calculateHashAndAddValue:[[UIDevice currentDevice] uniqueIdentifier] key:@"cc_id"];
+	// one way to prevent a replay attack is to send cc_id & cc_time and use it as primary keys
 
 	
-	[self addValue:gameName key:@"cc_gamename"];
+	[self addValue:[[UIDevice currentDevice] uniqueIdentifier] key:@"cc_id"];
+	[self addValue:gameName key:@"cc_name"];
 	[self addValue:[self getHashForData] key:@"cc_hash"];
 	[self addValue:SCORE_SERVER_PROTOCOL_VERSION key:@"cc_prot_ver"];
 
@@ -141,6 +154,7 @@
 
 -(NSString*) getHashForData
 {
+	NSString *ret;
 	unsigned char  pTempKey[16];
 	
 	// update the hash with the secret key
@@ -150,8 +164,13 @@
 	// then get the hash
 	CC_MD5_Final( pTempKey, &md5Ctx);
 
-	NSData *nsdata = [NSData dataWithBytes:pTempKey length:16];
-	return [nsdata description];
+//	NSData *nsdata = [NSData dataWithBytes:pTempKey length:16];
+	ret = [NSString stringWithString:@""];
+	for( int i=0;i<16;i++) {
+		ret = [NSString stringWithFormat:@"%@%02x", ret, pTempKey[i] ];
+	}
+
+	return ret;
 }
 
 -(NSString*) encodeData:(NSString*) data

@@ -21,6 +21,9 @@
 // Score Server protocol version
 #define SCORE_SERVER_PROTOCOL_VERSION @"1.0"
 
+// Server URL
+#define SCORE_SERVER_URL @"http://localhost:8080/post-score"
+
 /** Type of predefined Query */
 typedef enum {
 	kQueryIgnore,
