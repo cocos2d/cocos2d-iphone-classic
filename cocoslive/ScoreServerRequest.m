@@ -1,0 +1,149 @@
+/* cocos2d for iPhone
+ *
+ * http://code.google.com/p/cocos2d-iphone
+ *
+ * Copyright (C) 2008 Ricardo Quesada
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the 'cocos2d for iPhone' license.
+ *
+ * You will find a copy of this license within the cocos2d for iPhone
+ * distribution inside the "LICENSE" file.
+ *
+ */
+
+// 3rd party imports
+#import "CJSONDeserializer.h"
+
+// local imports
+#import "ScoreServer.h"
+#import "ScoreServerRequest.h"
+
+
+@interface ScoreServerRequest (Private)
+@end
+
+@implementation ScoreServerRequest
++(id) serverWithGameName:(NSString*) name delegate:(id) delegate
+{
+	return [[[self alloc] initWithGameName:name delegate:delegate] autorelease];
+}
+
+-(id) initWithGameName:(NSString*) name delegate:(id)aDelegate
+{
+	self = [super init];
+	if( self ) {
+		gameName = [name retain];
+		delegate = [aDelegate retain];
+		receivedData = [[NSMutableData data] retain];
+	}	
+	return self;
+}
+
+-(void) dealloc
+{
+#if DEBUG
+	NSLog( @"deallocing %@", self);
+#endif
+
+	[delegate release];
+	[gameName release];
+	[receivedData release];
+	[super dealloc];
+}
+
+-(BOOL) requestScores: (tQueryType) type limit:(int)limit offset:(int)offset order:(tQueryOrder)order flags:(tQueryFlags)flags
+{
+	// create the request	
+	[receivedData setLength:0];
+	
+	// arguments:
+	//  order: 0 =ASC, 1 = DESC
+	//  limit: how many scores are being requested
+	//  offset: offset of the scores
+	//  flags: bring only country scores, world scores, etc.
+	//  query: type of query
+	NSString *url= [NSString stringWithFormat:@"%@?cc_name=%@&order=%d&offset=%d&limit=%d&query=%d&flags=%d", SCORE_SERVER_REQUEST_URL, gameName, order, offset, limit, flags];
+		
+	NSURLRequest *request=[NSURLRequest requestWithURL:[NSURL URLWithString:url]
+										   cachePolicy:NSURLRequestUseProtocolCachePolicy
+											timeoutInterval:10.0];
+	
+	// create the connection with the request
+	// and start loading the data
+	NSURLConnection *theConnection=[[NSURLConnection alloc] initWithRequest:request delegate:self];
+	
+	if (! theConnection)
+		return NO;
+	
+	return YES;
+}
+
+-(NSArray*) parseScores
+{	
+	NSArray *array = nil;
+	NSString *jsonString = [NSString stringWithCString:[receivedData bytes] length: [receivedData length]];	
+
+	NSData *jsonData = [jsonString dataUsingEncoding:NSUTF32BigEndianStringEncoding];
+	NSError *error = nil;
+	NSDictionary *dictionary = [[CJSONDeserializer deserializer] deserializeAsDictionary:jsonData error:&error];
+	
+	if( ! error ) {
+		array = [dictionary objectForKey:@"scores"];
+	} else {
+		NSLog(@"Error parsing scores: %@", error);
+	}
+	return array;
+}
+
+
+#pragma mark NSURLConnection Delegate
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+    // this method is called when the server has determined that it
+    // has enough information to create the NSURLResponse
+	
+    // it can be called multiple times, for example in the case of a
+    // redirect, so each time we reset the data.
+    // receivedData is declared as a method instance elsewhere
+    [receivedData setLength:0];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+    // append the new data to the receivedData
+    // receivedData is declared as a method instance elsewhere
+	[receivedData appendData:data];
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+{
+    // release the connection, and the data object
+    [connection release];
+	
+	if( [delegate respondsToSelector:@selector(scoreRequestFail:) ] )
+		[delegate scoreRequestFail:self];
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{		
+    [connection release];
+	
+	if( [delegate respondsToSelector:@selector(scoreRequestOk:) ] )
+		[delegate scoreRequestOk:self];
+}
+
+-(NSURLRequest *)connection:(NSURLConnection *)connection
+			willSendRequest:(NSURLRequest *)request
+           redirectResponse:(NSURLResponse *)redirectResponse
+{
+    NSURLRequest *newRequest=request;
+    if (redirectResponse) {
+        newRequest=nil;
+    }
+	
+    return newRequest;
+}
+
+@end

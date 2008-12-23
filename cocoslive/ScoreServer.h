@@ -22,28 +22,7 @@
 #define SCORE_SERVER_PROTOCOL_VERSION @"1.0"
 
 // Server URL
-#define SCORE_SERVER_URL @"http://localhost:8080/post-score"
-
-/** Type of predefined Query */
-typedef enum {
-	kQueryIgnore,
-	kQueryDay,
-	kQueryWeek,
-	kQueryMonth,
-	kQueryAllTime,
-} tQueryType;
-
-/** Flags that can be added to the query */
-typedef enum {
-	kQueryFlagIgnore = 0,
-	kQueryFlagByCountry = 1 << 1,
-} tQueryFlags;
-
-/** Order can be Asc or Desc */
-typedef enum {
-	kQueryOrderAsc = 0,
-	kQueryOrderDesc = 1,
-} tQueryOrder;
+#define SCORE_SERVER_SEND_URL @"http://localhost:8080/post-score"
 
 
 @interface ScoreServer : NSObject {
@@ -71,13 +50,6 @@ typedef enum {
 
 /** initializes a cocos server with a game name and a game key */
 -(id) initWithGameName:(NSString*) name gameKey:(NSString*) key delegate:(id)delegate;
-
-/** fetch scores from server using a predefined query:
- * limit: a number between 1 and 1000
- * order: can be kQueryOrderAsc or kQueryOrderDesc
- * flags: can be kQueryFlagByCountry (fetches only scores from country)
- */
--(void) fetchScores: (tQueryType) type limit:(int)l order:(tQueryOrder)order flags:(tQueryFlags)flags;
 
 /** send the scores to the server */
 -(BOOL) sendScore: (NSDictionary*) dict;

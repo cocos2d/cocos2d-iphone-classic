@@ -14,7 +14,6 @@
 
 #import "ScoreServer.h"
 
-
 // free function used to sort
 NSInteger alphabeticSort(id string1, id string2, void *reverse)
 {
@@ -45,7 +44,8 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 		gameKey = [key retain];
 		gameName = [name retain];
 		bodyValues = [[NSMutableArray arrayWithCapacity:5] retain];
-		delegate = aDelegate;
+		delegate = [aDelegate retain];
+		receivedData = [[NSMutableData data] retain];
 	}
 	
 	return self;
@@ -61,12 +61,10 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 	[gameKey release];
 	[gameName release];
 	[bodyValues release];
+	[receivedData release];
 	[super dealloc];
 }
 
--(void) fetchScores: (tQueryType) type limit:(int)l order:(tQueryOrder)order flags:(tQueryFlags) flags
-{
-}
 
 #pragma mark ScoreServer send scores
 -(BOOL) sendScore: (NSDictionary*) dict
@@ -74,7 +72,7 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
     [receivedData setLength:0];
 		
 	// create the request
-	NSMutableURLRequest *post=[NSMutableURLRequest requestWithURL:[NSURL URLWithString: SCORE_SERVER_URL]
+	NSMutableURLRequest *post=[NSMutableURLRequest requestWithURL:[NSURL URLWithString: SCORE_SERVER_SEND_URL]
 													cachePolicy:NSURLRequestUseProtocolCachePolicy
 													timeoutInterval:10.0];
 	
