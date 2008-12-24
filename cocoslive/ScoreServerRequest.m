@@ -20,11 +20,8 @@
 #import "ScoreServerRequest.h"
 
 
-@interface ScoreServerRequest (Private)
-@end
-
 @implementation ScoreServerRequest
-+(id) serverWithGameName:(NSString*) name delegate:(id) delegate
++(id) serverWithGameName:(NSString*) name delegate:(id)delegate
 {
 	return [[[self alloc] initWithGameName:name delegate:delegate] autorelease];
 }
@@ -72,7 +69,6 @@
 	// create the connection with the request
 	// and start loading the data
 	NSURLConnection *theConnection=[[NSURLConnection alloc] initWithRequest:request delegate:self];
-	
 	if (! theConnection)
 		return NO;
 	
@@ -107,11 +103,12 @@
     // it can be called multiple times, for example in the case of a
     // redirect, so each time we reset the data.
     // receivedData is declared as a method instance elsewhere
+
     [receivedData setLength:0];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
-{
+{	
     // append the new data to the receivedData
     // receivedData is declared as a method instance elsewhere
 	[receivedData appendData:data];
@@ -119,30 +116,32 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    // release the connection, and the data object
+	// release the connection, and the data object
     [connection release];
-	
+
 	if( [delegate respondsToSelector:@selector(scoreRequestFail:) ] )
 		[delegate scoreRequestFail:self];
+
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{		
+{
+	// release the connection, and the data object
     [connection release];
-	
-	if( [delegate respondsToSelector:@selector(scoreRequestOk:) ] )
-		[delegate scoreRequestOk:self];
+
+	if( [delegate respondsToSelector:@selector(scoreRequestOk:) ] ) {
+		[delegate scoreRequestOk:self];	
+	}
 }
 
 -(NSURLRequest *)connection:(NSURLConnection *)connection
 			willSendRequest:(NSURLRequest *)request
            redirectResponse:(NSURLResponse *)redirectResponse
-{
+{	
     NSURLRequest *newRequest=request;
     if (redirectResponse) {
         newRequest=nil;
     }
-	
     return newRequest;
 }
 

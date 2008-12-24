@@ -56,7 +56,6 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 #if DEBUG
 	NSLog( @"deallocing %@", self);
 #endif
-
 	[delegate release];
 	[gameKey release];
 	[gameName release];

@@ -2634,6 +2634,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/UIKit.framework/Headers/UIKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = Resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -3131,6 +3132,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/UIKit.framework/Headers/UIKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = Resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -3258,6 +3260,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/UIKit.framework/Headers/UIKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = Resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -3414,6 +3417,7 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/build/Debug-iphonesimulator\"",
