@@ -16,7 +16,7 @@
 #import <UIKit/UIKit.h>
 
 // Server URL
-#define SCORE_SERVER_REQUEST_URL @"http://localhost:8080/get-scores"
+#define SCORE_SERVER_REQUEST_URL @"http://cocoslive.appspot.com/get-scores"
 
 /** Type of predefined Query */
 typedef enum {
@@ -62,8 +62,16 @@ typedef enum {
  * limit: a number between 1 and 1000
  * order: can be kQueryOrderAsc or kQueryOrderDesc
  * flags: can be kQueryFlagByCountry (fetches only scores from country)
+ * category: an NSString. For example: 'easy', 'medium', 'type1'... When requesting scores, they can be filtered by this field.
  */
--(BOOL) requestScores: (tQueryType) type limit:(int)l offset:(int)o order:(tQueryOrder)order flags:(tQueryFlags)flags;
+-(BOOL) requestScores: (tQueryType) type limit:(int)limit offset:(int)offset order:(tQueryOrder)order flags:(tQueryFlags)flags category:(NSString*)category;
+
+/** request scores from server using a predefined query. This is an asyncronous request.
+ * limit: a number between 1 and 1000
+ * order: can be kQueryOrderAsc or kQueryOrderDesc
+ * flags: can be kQueryFlagByCountry (fetches only scores from country)
+ */
+-(BOOL) requestScores: (tQueryType) type limit:(int)limit offset:(int)order order:(tQueryOrder)order flags:(tQueryFlags)flags;
 
 /** parse the received JSON scores and convert it to objective-c objects */
 -(NSArray*) parseScores;

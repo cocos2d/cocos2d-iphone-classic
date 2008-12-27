@@ -49,18 +49,32 @@
 	[super dealloc];
 }
 
--(BOOL) requestScores: (tQueryType) type limit:(int)limit offset:(int)offset order:(tQueryOrder)order flags:(tQueryFlags)flags
+-(BOOL) requestScores:(tQueryType)type
+				limit:(int)limit
+			   offset:(int)offset
+				order:(tQueryOrder)order
+				flags:(tQueryFlags)flags
+			 category:(NSString*)category
 {
 	// create the request	
 	[receivedData setLength:0];
 	
 	// arguments:
-	//  order: 0 =ASC, 1 = DESC
+	//  query: type of query
 	//  limit: how many scores are being requested
 	//  offset: offset of the scores
+	//  order: 0 =ASC, 1 = DESC
 	//  flags: bring only country scores, world scores, etc.
-	//  query: type of query
-	NSString *url= [NSString stringWithFormat:@"%@?cc_name=%@&order=%d&offset=%d&limit=%d&query=%d&flags=%d", SCORE_SERVER_REQUEST_URL, gameName, order, offset, limit, flags];
+	//  category: string user defined string used to filter
+	NSString *url= [NSString stringWithFormat:@"%@?gamename=%@&querytype=%d&&order=%d&offset=%d&limit=%d&flags=%d&category=%@",
+					SCORE_SERVER_REQUEST_URL,
+					gameName,
+					type,
+					order,
+					offset,
+					limit,
+					flags,
+					category];
 		
 	NSURLRequest *request=[NSURLRequest requestWithURL:[NSURL URLWithString:url]
 										   cachePolicy:NSURLRequestUseProtocolCachePolicy
@@ -73,6 +87,24 @@
 		return NO;
 	
 	return YES;
+}
+
+-(BOOL) requestScores:(tQueryType)type
+				limit:(int)limit
+			   offset:(int)offset
+				order:(tQueryOrder)order
+				flags:(tQueryFlags)flags
+{
+	// create the request	
+	[receivedData setLength:0];
+	
+	// arguments:
+	//  query: type of query
+	//  limit: how many scores are being requested
+	//  offset: offset of the scores
+	//  order: 0 =ASC, 1 = DESC
+	//  flags: bring only country scores, world scores, etc.
+	return [self requestScores:type limit:limit offset:offset order:order flags:flags category:@""];
 }
 
 -(NSArray*) parseScores

@@ -22,7 +22,7 @@
 #define SCORE_SERVER_PROTOCOL_VERSION @"1.0"
 
 // Server URL
-#define SCORE_SERVER_SEND_URL @"http://192.168.1.103:8080/post-score"
+#define SCORE_SERVER_SEND_URL @"http://cocoslive.appspot.com/post-score"
 
 
 @interface ScoreServer : NSObject {

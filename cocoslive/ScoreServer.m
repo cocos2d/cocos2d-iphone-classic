@@ -92,7 +92,7 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 
 	
 	[self addValue:[[UIDevice currentDevice] uniqueIdentifier] key:@"cc_id"];
-	[self addValue:gameName key:@"cc_name"];
+	[self addValue:gameName key:@"cc_gamename"];
 	[self addValue:[self getHashForData] key:@"cc_hash"];
 	[self addValue:SCORE_SERVER_PROTOCOL_VERSION key:@"cc_prot_ver"];
 

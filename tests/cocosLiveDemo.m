@@ -21,11 +21,21 @@
 
 -(void) testPost
 {
-	ScoreServer *server = [[ScoreServer alloc] initWithGameName:@"SapusTongue" gameKey:@"945fe3ede5de5ae8f45461b46fd954ba" delegate:nil];
+	ScoreServer *server = [[ScoreServer alloc] initWithGameName:@"SapusTongue" gameKey:@"dad2817f628dca0f8fe29d9b84f701ec" delegate:nil];
 
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:2];
 	
-	[dict setObject: [NSNumber numberWithInt:888845] forKey:@"usr_score"];
+	// usr_ are fields that can be modified. user fields
+	[dict setObject: [NSNumber numberWithInt:7280] forKey:@"usr_score"];
+	// usr_ are fields that can be modified. user fields
+	[dict setObject: [NSNumber numberWithInt:1200] forKey:@"usr_speed"];
+	// usr_ are fields that can be modified. user fields
+	[dict setObject: [NSNumber numberWithInt:122] forKey:@"usr_angle"];
+	// usr_ are fields that can be modified. user fields
+	[dict setObject: @"Tito" forKey:@"usr_player"];
+
+	// cc_ are fields that cannot be modified. cocos fields
+	// [dict setObject: @"" forKey:@"cc_category"];
 	
 	[server sendScore:dict];
 	[server release];
@@ -34,14 +44,15 @@
 -(void) testRequest
 {
 	ScoreServerRequest *request = [[ScoreServerRequest alloc] initWithGameName:@"SapusTongue" delegate:self];
-	[request requestScores:0 limit:25 offset:0 order:0 flags:0];
+	[request requestScores:kQueryMonth limit:25 offset:0 order:kQueryOrderDesc flags:kQueryFlagIgnore];
 }
 
 -(void) scoreRequestOk: (id) sender
 {
 	NSLog(@"score request OK");
 	
-//	NSArray *scores = [sender parseScores];	
+	NSArray *scores = [sender parseScores];	
+	NSLog(@"%@", scores);
 	[sender release];
 
 }
