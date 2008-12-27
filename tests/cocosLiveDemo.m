@@ -21,7 +21,7 @@
 
 -(void) testPost
 {
-	ScoreServer *server = [[ScoreServer alloc] initWithGameName:@"SapusTongue" gameKey:@"dad2817f628dca0f8fe29d9b84f701ec" delegate:nil];
+	ScoreServerPost *server = [[ScoreServerPost alloc] initWithGameName:@"TestGame" gameKey:@"dad2817f628dca0f8fe29d9b84f701ec" delegate:nil];
 
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:2];
 	
