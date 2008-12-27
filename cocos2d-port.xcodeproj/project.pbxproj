@@ -393,8 +393,8 @@
 		50F8B4C90EFED84900FCD300 /* cocosLiveDemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 50F8B4BB0EFED80D00FCD300 /* cocosLiveDemo.m */; };
 		50F8B5150EFEE60D00FCD300 /* cocoslive.h in Headers */ = {isa = PBXBuildFile; fileRef = 50F8B5130EFEE60D00FCD300 /* cocoslive.h */; };
 		50F8B5160EFEE60D00FCD300 /* cocoslive.m in Sources */ = {isa = PBXBuildFile; fileRef = 50F8B5140EFEE60D00FCD300 /* cocoslive.m */; };
-		50F8B51E0EFEE80C00FCD300 /* ScoreServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 50F8B51C0EFEE80C00FCD300 /* ScoreServer.h */; };
-		50F8B51F0EFEE80C00FCD300 /* ScoreServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 50F8B51D0EFEE80C00FCD300 /* ScoreServer.m */; };
+		50F8B51E0EFEE80C00FCD300 /* ScoreServerPost.h in Headers */ = {isa = PBXBuildFile; fileRef = 50F8B51C0EFEE80C00FCD300 /* ScoreServerPost.h */; };
+		50F8B51F0EFEE80C00FCD300 /* ScoreServerPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 50F8B51D0EFEE80C00FCD300 /* ScoreServerPost.m */; };
 		50F8B6170EFF0B5700FCD300 /* libcocoslive.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 50F8B50F0EFEE5EA00FCD300 /* libcocoslive.a */; };
 		50F8B6190EFF0B7A00FCD300 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50F8B6180EFF0B7A00FCD300 /* Foundation.framework */; };
 		50F8B61B0EFF0B8100FCD300 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50F8B61A0EFF0B8100FCD300 /* UIKit.framework */; };
@@ -776,8 +776,8 @@
 		50F8B5130EFEE60D00FCD300 /* cocoslive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cocoslive.h; sourceTree = "<group>"; };
 		50F8B5140EFEE60D00FCD300 /* cocoslive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = cocoslive.m; sourceTree = "<group>"; };
 		50F8B51B0EFEE68B00FCD300 /* cocosLiveDemo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cocosLiveDemo.h; path = tests/cocosLiveDemo.h; sourceTree = "<group>"; };
-		50F8B51C0EFEE80C00FCD300 /* ScoreServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScoreServer.h; sourceTree = "<group>"; };
-		50F8B51D0EFEE80C00FCD300 /* ScoreServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScoreServer.m; sourceTree = "<group>"; };
+		50F8B51C0EFEE80C00FCD300 /* ScoreServerPost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScoreServerPost.h; sourceTree = "<group>"; };
+		50F8B51D0EFEE80C00FCD300 /* ScoreServerPost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScoreServerPost.m; sourceTree = "<group>"; };
 		50F8B6180EFF0B7A00FCD300 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		50F8B61A0EFF0B8100FCD300 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		50F9E8160E1AA34E000E7616 /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
@@ -1400,8 +1400,8 @@
 			children = (
 				50C2A0350F0163D30048C4B8 /* ScoreServerRequest.h */,
 				50C2A0360F0163D30048C4B8 /* ScoreServerRequest.m */,
-				50F8B51C0EFEE80C00FCD300 /* ScoreServer.h */,
-				50F8B51D0EFEE80C00FCD300 /* ScoreServer.m */,
+				50F8B51C0EFEE80C00FCD300 /* ScoreServerPost.h */,
+				50F8B51D0EFEE80C00FCD300 /* ScoreServerPost.m */,
 				50F8B5130EFEE60D00FCD300 /* cocoslive.h */,
 				50F8B5140EFEE60D00FCD300 /* cocoslive.m */,
 			);
@@ -1493,7 +1493,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				50F8B5150EFEE60D00FCD300 /* cocoslive.h in Headers */,
-				50F8B51E0EFEE80C00FCD300 /* ScoreServer.h in Headers */,
+				50F8B51E0EFEE80C00FCD300 /* ScoreServerPost.h in Headers */,
 				50C2A0370F0163D30048C4B8 /* ScoreServerRequest.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2402,7 +2402,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				50F8B5160EFEE60D00FCD300 /* cocoslive.m in Sources */,
-				50F8B51F0EFEE80C00FCD300 /* ScoreServer.m in Sources */,
+				50F8B51F0EFEE80C00FCD300 /* ScoreServerPost.m in Sources */,
 				50C2A0380F0163D30048C4B8 /* ScoreServerRequest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

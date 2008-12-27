@@ -32,7 +32,9 @@
 	// usr_ are fields that can be modified. user fields
 	[dict setObject: [NSNumber numberWithInt:122] forKey:@"usr_angle"];
 	// usr_ are fields that can be modified. user fields
-	[dict setObject: @"Tito" forKey:@"usr_player"];
+	[dict setObject: @"Tito" forKey:@"usr_playername"];
+	// usr_ are fields that can be modified. user fields
+	[dict setObject: [NSNumber numberWithInt:0] forKey:@"usr_playertype"];
 
 	// cc_ are fields that cannot be modified. cocos fields
 	// [dict setObject: @"" forKey:@"cc_category"];
