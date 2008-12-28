@@ -16,7 +16,7 @@
 #import "CJSONDeserializer.h"
 
 // local imports
-#import "ScoreServer.h"
+#import "ScoreServerPost.h"
 #import "ScoreServerRequest.h"
 
 
@@ -61,7 +61,7 @@
 	
 	// arguments:
 	//  query: type of query
-	//  limit: how many scores are being requested
+	//  limit: how many scores are being requested. Default is 25. Maximun is 100
 	//  offset: offset of the scores
 	//  order: 0 =ASC, 1 = DESC
 	//  flags: bring only country scores, world scores, etc.
@@ -100,7 +100,7 @@
 	
 	// arguments:
 	//  query: type of query
-	//  limit: how many scores are being requested
+	//  limit: how many scores are being requested. Maximun is 100
 	//  offset: offset of the scores
 	//  order: 0 =ASC, 1 = DESC
 	//  flags: bring only country scores, world scores, etc.

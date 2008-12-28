@@ -20,7 +20,7 @@
 //
 // all cocos live include files
 //
-#import "ScoreServer.h"
+#import "ScoreServerPost.h"
 #import "ScoreServerRequest.h"
 
 

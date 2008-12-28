@@ -25,7 +25,7 @@
 #define SCORE_SERVER_SEND_URL @"http://cocoslive.appspot.com/post-score"
 
 
-@interface ScoreServer : NSObject {
+@interface ScoreServerPost : NSObject {
 	/// game key. secret shared with the server.
 	/// used to sign the values to prevent spoofing.
 	NSString	*gameKey;

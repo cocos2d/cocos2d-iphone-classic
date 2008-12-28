@@ -20,11 +20,11 @@
 
 /** Type of predefined Query */
 typedef enum {
-	kQueryIgnore,
-	kQueryDay,
-	kQueryWeek,
-	kQueryMonth,
-	kQueryAllTime,
+	kQueryIgnore = 0,
+	kQueryDay = 1,
+	kQueryWeek = 2,
+	kQueryMonth = 3,
+	kQueryAllTime = 4,
 } tQueryType;
 
 /** Flags that can be added to the query */
@@ -59,7 +59,7 @@ typedef enum {
 -(id) initWithGameName:(NSString*) name delegate:(id)delegate;
 
 /** request scores from server using a predefined query. This is an asyncronous request.
- * limit: a number between 1 and 1000
+ * limit: how many scores are being requested. Maximun is 100
  * order: can be kQueryOrderAsc or kQueryOrderDesc
  * flags: can be kQueryFlagByCountry (fetches only scores from country)
  * category: an NSString. For example: 'easy', 'medium', 'type1'... When requesting scores, they can be filtered by this field.
@@ -67,7 +67,7 @@ typedef enum {
 -(BOOL) requestScores: (tQueryType) type limit:(int)limit offset:(int)offset order:(tQueryOrder)order flags:(tQueryFlags)flags category:(NSString*)category;
 
 /** request scores from server using a predefined query. This is an asyncronous request.
- * limit: a number between 1 and 1000
+ * limit: how many scores are being requested. Maximun is 100
  * order: can be kQueryOrderAsc or kQueryOrderDesc
  * flags: can be kQueryFlagByCountry (fetches only scores from country)
  */
