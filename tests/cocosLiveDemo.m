@@ -4,12 +4,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#include <sys/time.h>
 
 // cocos import
 #import "cocoslive.h"
 
 // local import
 #import "cocosLiveDemo.h"
+
+#define RANDOM_FLOAT() (((float)random() / (float)0x7fffffff))
 
 @interface AppController (Private)
 -(void) testRequest;
@@ -19,25 +22,41 @@
 // CLASS IMPLEMENTATIONS
 @implementation AppController
 
+-(void) initRandom {
+	struct timeval t;
+	gettimeofday(&t, nil);
+	unsigned int i;
+	i = t.tv_sec;
+	i += t.tv_usec;
+	srandom(i);	
+}
+
+-(int) getRandomWithMax:(int)max 
+{
+	return RANDOM_FLOAT() * max;
+}
+
 -(void) testPost
 {
-	ScoreServerPost *server = [[ScoreServerPost alloc] initWithGameName:@"TestGame" gameKey:@"dad2817f628dca0f8fe29d9b84f701ec" delegate:nil];
+	ScoreServerPost *server = [[ScoreServerPost alloc] initWithGameName:@"DemoGame" gameKey:@"e8e0765de336f46b17a39ad652ee4d39" delegate:nil];
 
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:2];
 	
-	// usr_ are fields that can be modified. user fields
-	[dict setObject: [NSNumber numberWithInt:7280] forKey:@"usr_score"];
-	// usr_ are fields that can be modified. user fields
-	[dict setObject: [NSNumber numberWithInt:1200] forKey:@"usr_speed"];
-	// usr_ are fields that can be modified. user fields
-	[dict setObject: [NSNumber numberWithInt:122] forKey:@"usr_angle"];
-	// usr_ are fields that can be modified. user fields
+	// usr_ are fields that can be modified.
+	// set score
+	[dict setObject: [NSNumber numberWithInt: [self getRandomWithMax:20000] ] forKey:@"usr_score"];
+	// set speed
+	[dict setObject: [NSNumber numberWithInt: [self getRandomWithMax:2000] ] forKey:@"usr_speed"];
+	// set angle
+	[dict setObject: [NSNumber numberWithInt:[self getRandomWithMax:360] ] forKey:@"usr_angle"];
+	// set playername
 	[dict setObject: @"Tito" forKey:@"usr_playername"];
-	// usr_ are fields that can be modified. user fields
-	[dict setObject: [NSNumber numberWithInt:0] forKey:@"usr_playertype"];
+	// set player type
+	[dict setObject: [NSNumber numberWithInt: [self getRandomWithMax:1] ] forKey:@"usr_playertype"];
 
 	// cc_ are fields that cannot be modified. cocos fields
-	// [dict setObject: @"" forKey:@"cc_category"];
+	// set category... it can be "easy", "medium", whatever you want.
+	[dict setObject: @"easy" forKey:@"cc_category"];
 	
 	[server sendScore:dict];
 	[server release];
@@ -45,8 +64,8 @@
 
 -(void) testRequest
 {
-	ScoreServerRequest *request = [[ScoreServerRequest alloc] initWithGameName:@"SapusTongue" delegate:self];
-	[request requestScores:kQueryMonth limit:25 offset:0 order:kQueryOrderDesc flags:kQueryFlagIgnore];
+	ScoreServerRequest *request = [[ScoreServerRequest alloc] initWithGameName:@"DemoGame" delegate:self];
+	[request requestScores:kQueryMonth limit:25 offset:0 order:kQueryOrderDesc flags:kQueryFlagIgnore category:@"easy"];
 }
 
 -(void) scoreRequestOk: (id) sender
@@ -70,6 +89,7 @@
 
 -(void) applicationDidFinishLaunching:(UIApplication*)application
 {
+	[self initRandom];
 	[self testPost];
 	[self testRequest];
 }
