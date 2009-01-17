@@ -38,7 +38,7 @@
 
 -(void) testPost
 {
-	ScoreServerPost *server = [[ScoreServerPost alloc] initWithGameName:@"DemoGame" gameKey:@"e8e0765de336f46b17a39ad652ee4d39" delegate:nil];
+	ScoreServerPost *server = [[ScoreServerPost alloc] initWithGameName:@"DemoGame" gameKey:@"029e2dccd4b73844f55700bbe2c580ca" delegate:nil];
 
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:2];
 	
@@ -52,7 +52,7 @@
 	// set playername
 	[dict setObject: @"Tito" forKey:@"usr_playername"];
 	// set player type
-	[dict setObject: [NSNumber numberWithInt: [self getRandomWithMax:1] ] forKey:@"usr_playertype"];
+	[dict setObject: [NSNumber numberWithInt: [self getRandomWithMax:2] ] forKey:@"usr_playertype"];
 
 	// cc_ are fields that cannot be modified. cocos fields
 	// set category... it can be "easy", "medium", whatever you want.
@@ -65,7 +65,7 @@
 -(void) testRequest
 {
 	ScoreServerRequest *request = [[ScoreServerRequest alloc] initWithGameName:@"DemoGame" delegate:self];
-	[request requestScores:kQueryMonth limit:25 offset:0 order:kQueryOrderDesc flags:kQueryFlagIgnore category:@"easy"];
+	[request requestScores:kQueryMonth limit:25 offset:0 flags:kQueryFlagIgnore category:@"easy"];
 }
 
 -(void) scoreRequestOk: (id) sender

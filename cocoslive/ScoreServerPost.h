@@ -18,11 +18,19 @@
 // for MD5 signing
 #import <CommonCrypto/CommonDigest.h>
 
+// cocoslive definitions
+#import "cocoslive.h"
+
 // Score Server protocol version
 #define SCORE_SERVER_PROTOCOL_VERSION @"1.0"
 
 // Server URL
-#define SCORE_SERVER_SEND_URL @"http://cocoslive.appspot.com/post-score"
+#ifdef USE_LOCAL_SERVER
+#define SCORE_SERVER_SEND_URL @"http://localhost:8080/api/post-score"
+#else
+#define SCORE_SERVER_SEND_URL @"http://cocoslive.appspot.com/api/post-score"
+#endif
+
 
 
 @interface ScoreServerPost : NSObject {

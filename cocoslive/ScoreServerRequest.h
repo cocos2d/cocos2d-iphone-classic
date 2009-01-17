@@ -15,8 +15,15 @@
 
 #import <UIKit/UIKit.h>
 
+// cocoslive definitions
+#import "cocoslive.h"
+
 // Server URL
-#define SCORE_SERVER_REQUEST_URL @"http://cocoslive.appspot.com/get-scores"
+#if USE_LOCAL_SERVER
+#define SCORE_SERVER_REQUEST_URL @"http://localhost:8080/api/get-scores"
+#else
+#define SCORE_SERVER_REQUEST_URL @"http://cocoslive.appspot.com/api/get-scores"
+#endif
 
 /** Type of predefined Query */
 typedef enum {
@@ -32,13 +39,6 @@ typedef enum {
 	kQueryFlagIgnore = 0,
 	kQueryFlagByCountry = 1 << 1,
 } tQueryFlags;
-
-/** Order can be Asc or Desc */
-typedef enum {
-	kQueryOrderAsc = 0,
-	kQueryOrderDesc = 1,
-} tQueryOrder;
-
 
 @interface ScoreServerRequest : NSObject {
 	
@@ -60,18 +60,16 @@ typedef enum {
 
 /** request scores from server using a predefined query. This is an asyncronous request.
  * limit: how many scores are being requested. Maximun is 100
- * order: can be kQueryOrderAsc or kQueryOrderDesc
  * flags: can be kQueryFlagByCountry (fetches only scores from country)
  * category: an NSString. For example: 'easy', 'medium', 'type1'... When requesting scores, they can be filtered by this field.
  */
--(BOOL) requestScores: (tQueryType) type limit:(int)limit offset:(int)offset order:(tQueryOrder)order flags:(tQueryFlags)flags category:(NSString*)category;
+-(BOOL) requestScores: (tQueryType) type limit:(int)limit offset:(int)offset flags:(tQueryFlags)flags category:(NSString*)category;
 
 /** request scores from server using a predefined query. This is an asyncronous request.
  * limit: how many scores are being requested. Maximun is 100
- * order: can be kQueryOrderAsc or kQueryOrderDesc
  * flags: can be kQueryFlagByCountry (fetches only scores from country)
  */
--(BOOL) requestScores: (tQueryType) type limit:(int)limit offset:(int)order order:(tQueryOrder)order flags:(tQueryFlags)flags;
+-(BOOL) requestScores: (tQueryType) type limit:(int)limit offset:(int)offset flags:(tQueryFlags)flags;
 
 /** parse the received JSON scores and convert it to objective-c objects */
 -(NSArray*) parseScores;

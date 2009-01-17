@@ -52,7 +52,6 @@
 -(BOOL) requestScores:(tQueryType)type
 				limit:(int)limit
 			   offset:(int)offset
-				order:(tQueryOrder)order
 				flags:(tQueryFlags)flags
 			 category:(NSString*)category
 {
@@ -63,14 +62,12 @@
 	//  query: type of query
 	//  limit: how many scores are being requested. Default is 25. Maximun is 100
 	//  offset: offset of the scores
-	//  order: 0 =ASC, 1 = DESC
 	//  flags: bring only country scores, world scores, etc.
 	//  category: string user defined string used to filter
-	NSString *url= [NSString stringWithFormat:@"%@?gamename=%@&querytype=%d&&order=%d&offset=%d&limit=%d&flags=%d&category=%@",
+	NSString *url= [NSString stringWithFormat:@"%@?gamename=%@&querytype=%d&offset=%d&limit=%d&flags=%d&category=%@",
 					SCORE_SERVER_REQUEST_URL,
 					gameName,
 					type,
-					order,
 					offset,
 					limit,
 					flags,
@@ -92,7 +89,6 @@
 -(BOOL) requestScores:(tQueryType)type
 				limit:(int)limit
 			   offset:(int)offset
-				order:(tQueryOrder)order
 				flags:(tQueryFlags)flags
 {
 	// create the request	
@@ -102,9 +98,8 @@
 	//  query: type of query
 	//  limit: how many scores are being requested. Maximun is 100
 	//  offset: offset of the scores
-	//  order: 0 =ASC, 1 = DESC
 	//  flags: bring only country scores, world scores, etc.
-	return [self requestScores:type limit:limit offset:offset order:order flags:flags category:@""];
+	return [self requestScores:type limit:limit offset:offset flags:flags category:@""];
 }
 
 -(NSArray*) parseScores
