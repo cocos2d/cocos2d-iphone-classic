@@ -38,7 +38,7 @@
 
 -(void) testPost
 {
-	ScoreServerPost *server = [[ScoreServerPost alloc] initWithGameName:@"DemoGame" gameKey:@"029e2dccd4b73844f55700bbe2c580ca" delegate:nil];
+	ScoreServerPost *server = [[ScoreServerPost alloc] initWithGameName:@"DemoGame" gameKey:@"e8e0765de336f46b17a39ad652ee4d39" delegate:nil];
 
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:2];
 	

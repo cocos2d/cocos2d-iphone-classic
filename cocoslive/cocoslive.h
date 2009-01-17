@@ -17,9 +17,9 @@
 // 00   00 01 00
 #define COCOSLIVE_VERSION 0x00000100
 
-// to use localserver
-#define USE_LOCAL_SERVER 1	// DEBUG ONLY
-//
+// to use localserver. DEBUG ONLY
+// #define USE_LOCAL_SERVER 1
+
 // all cocos live include files
 //
 #import "ScoreServerPost.h"
