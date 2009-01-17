@@ -44,7 +44,7 @@
 	
 	// usr_ are fields that can be modified.
 	// set score
-	[dict setObject: [NSNumber numberWithInt: [self getRandomWithMax:20000] ] forKey:@"usr_score"];
+	[dict setObject: [NSNumber numberWithInt: [self getRandomWithMax:20000] ] forKey:@"cc_score"];
 	// set speed
 	[dict setObject: [NSNumber numberWithInt: [self getRandomWithMax:2000] ] forKey:@"usr_speed"];
 	// set angle
