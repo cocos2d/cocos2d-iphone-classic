@@ -27,10 +27,10 @@
 }
 
 -(id) initWithGameName:(NSString*) name delegate:(id)aDelegate
-{
+{	
 	self = [super init];
 	if( self ) {
-		gameName = [name retain];
+		gameName = [[name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] retain];
 		delegate = [aDelegate retain];
 		receivedData = [[NSMutableData data] retain];
 	}	
@@ -145,6 +145,8 @@
 {
 	// release the connection, and the data object
     [connection release];
+
+	NSLog(@"Error getting scores: %@", error);
 
 	if( [delegate respondsToSelector:@selector(scoreRequestFail:) ] )
 		[delegate scoreRequestFail:self];
