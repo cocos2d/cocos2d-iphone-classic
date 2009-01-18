@@ -28,7 +28,7 @@
 #ifdef USE_LOCAL_SERVER
 #define SCORE_SERVER_SEND_URL @"http://localhost:8080/api/post-score"
 #else
-#define SCORE_SERVER_SEND_URL @"http://cocoslive.appspot.com/api/post-score"
+#define SCORE_SERVER_SEND_URL @"http://www.cocoslive.net/api/post-score"
 #endif
 
 

@@ -22,7 +22,7 @@
 #if USE_LOCAL_SERVER
 #define SCORE_SERVER_REQUEST_URL @"http://localhost:8080/api/get-scores"
 #else
-#define SCORE_SERVER_REQUEST_URL @"http://cocoslive.appspot.com/api/get-scores"
+#define SCORE_SERVER_REQUEST_URL @"http://www.cocoslive.net/api/get-scores"
 #endif
 
 /** Type of predefined Query */
@@ -37,7 +37,7 @@ typedef enum {
 /** Flags that can be added to the query */
 typedef enum {
 	kQueryFlagIgnore = 0,
-	kQueryFlagByCountry = 1 << 1,
+	kQueryFlagByCountry = 1 << 0,
 } tQueryFlags;
 
 @interface ScoreServerRequest : NSObject {

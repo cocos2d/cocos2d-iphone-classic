@@ -56,7 +56,22 @@
 
 	// cc_ are fields that cannot be modified. cocos fields
 	// set category... it can be "easy", "medium", whatever you want.
-	[dict setObject: @"easy" forKey:@"cc_category"];
+	int r = [self getRandomWithMax:3];
+	NSString *category;
+	switch(r) {
+		case 0:
+			category = @"easy";
+			break;
+		case 1:
+			category = @"medium";
+			break;
+		case 2:
+		default:
+			category = @"hard";
+			break;
+	}
+	
+	[dict setObject:category forKey:@"cc_category"];
 	
 	[server sendScore:dict];
 	[server release];
@@ -65,7 +80,11 @@
 -(void) testRequest
 {
 	ScoreServerRequest *request = [[ScoreServerRequest alloc] initWithGameName:@"DemoGame" delegate:self];
-	[request requestScores:kQueryMonth limit:25 offset:0 flags:kQueryFlagIgnore category:@"easy"];
+//	[request requestScores:kQueryAllTime limit:25 offset:0 flags:kQueryFlagIgnore category:@"easy"];
+
+	// Only ask for the scores from certain country... in this case, from "your" country
+	[request requestScores:kQueryAllTime limit:25 offset:0 flags:kQueryFlagByCountry category:@"easy"];
+
 }
 
 -(void) scoreRequestOk: (id) sender
@@ -90,7 +109,8 @@
 -(void) applicationDidFinishLaunching:(UIApplication*)application
 {
 	[self initRandom];
-	[self testPost];
+	for( int i=0; i< 5;i++)
+		[self testPost];
 	[self testRequest];
 }
 @end
