@@ -109,7 +109,7 @@
 -(void) applicationDidFinishLaunching:(UIApplication*)application
 {
 	[self initRandom];
-	for( int i=0; i< 5;i++)
+	for( int i=0; i< 15;i++)
 		[self testPost];
 	[self testRequest];
 }

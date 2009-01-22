@@ -31,8 +31,21 @@
 #define SCORE_SERVER_SEND_URL @"http://www.cocoslive.net/api/post-score"
 #endif
 
+/// Type of errors from the Post Score request
+typedef enum {
+	/// post request successful
+	kPostStatusOK = 0,
+	/// post request failed to establish a connection. wi-fi isn't enabled.
+	/// Don't retry when this option is preset
+	kPostStatusConnectionFailed = 1,
+	/// post request failed to post the score. Server might be busy.
+	/// Retry is suggested
+	kPostStatusPostFailed = 2,
+} tPostStatus;
 
-
+/**
+ * Handles the Score Post to the cocos live server
+ */
 @interface ScoreServerPost : NSObject {
 	/// game key. secret shared with the server.
 	/// used to sign the values to prevent spoofing.
@@ -44,12 +57,16 @@
 	/// delegate instance of fetch score
 	id			delegate;
 
-	// data received
+	/// data received
 	NSMutableData *receivedData;
 	
-	// values to send in the POST
+	/// values to send in the POST
 	NSMutableArray *bodyValues;
 	
+	/// status of the request
+	tPostStatus		postStatus;
+	
+	/// mdt context
 	CC_MD5_CTX		md5Ctx;
 }
 

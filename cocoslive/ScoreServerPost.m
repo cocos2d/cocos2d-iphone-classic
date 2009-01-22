@@ -69,6 +69,9 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 -(BOOL) sendScore: (NSDictionary*) dict
 {	
     [receivedData setLength:0];
+	
+	// reset status
+	postStatus = kPostStatusOK;
 		
 	// create the request
 	NSMutableURLRequest *post=[NSMutableURLRequest requestWithURL:[NSURL URLWithString: SCORE_SERVER_SEND_URL]
@@ -202,12 +205,20 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
     // receivedData is declared as a method instance elsewhere
 	[receivedData appendData:data];
 	
-	NSString *dataString = [NSString stringWithCString:[data bytes] length: [data length]];
-	NSLog( @"data: %@", dataString);
+#if DEBUG
+//	NSString *dataString = [NSString stringWithCString:[data bytes] length: [data length]];
+//	NSLog( @"data: %@", dataString);
+#endif
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
+#if DEBUG
+	NSLog(@"Connection failed");
+#endif
+	// wifi problems ?
+	postStatus = kPostStatusConnectionFailed;
+
     // release the connection, and the data object
     [connection release];
 	
@@ -216,11 +227,27 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{		
+{	
     [connection release];
 	
-	if( [delegate respondsToSelector:@selector(scoreRequestOk:) ] )
-		[delegate scoreRequestOk:self];
+	NSString *dataString = [NSString stringWithCString:[receivedData bytes] length: [receivedData length]];
+	if( [dataString isEqual: @"OK"] ) {
+		
+		// Ok
+		postStatus = kPostStatusOK;
+
+		if( [delegate respondsToSelector:@selector(scoreRequestOk:) ] )
+			[delegate scoreRequestOk:self];
+	} else {
+#if DEBUG
+		NSLog(@"Post Score failed. Reason: %@", dataString);
+#endif
+		// Error parsing answer
+		postStatus = kPostStatusPostFailed;
+
+		if( [delegate respondsToSelector:@selector(scoreRequestFail:) ] )
+			[delegate scoreRequestFail:self];
+	}
 }
 
 -(NSURLRequest *)connection:(NSURLConnection *)connection

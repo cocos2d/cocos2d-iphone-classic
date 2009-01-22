@@ -40,6 +40,9 @@ typedef enum {
 	kQueryFlagByCountry = 1 << 0,
 } tQueryFlags;
 
+/**
+ * Handles the Request Scores to the cocos live server
+ */
 @interface ScoreServerRequest : NSObject {
 	
 	/// game name, used as a login name.
