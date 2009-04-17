@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -21,10 +21,17 @@
 #import "CameraAction.h"
 #import "Layer.h"
 #import "Camera.h"
+#import "TiledGridAction.h"
+#import "EaseAction.h"
+#import "Support/CGPointExtension.h"
 
 enum {
 	kSceneFade = 0xFADEFADE,
 };
+
+@interface TransitionScene (Private)
+-(void) addScenes;
+@end
 
 @implementation TransitionScene
 +(id) transitionWithDuration:(ccTime) t scene:(Scene*)s
@@ -56,11 +63,15 @@ enum {
 	// disable events while transitions
 	[[Director sharedDirector] setEventsEnabled: NO];
 
-	// add both scenes
-	[self add: inScene z:1];
-	[self add: outScene z:0];
-	
+	[self addScenes];
 	return self;
+}
+
+-(void) addScenes
+{
+	// add both scenes
+	[self addChild: inScene z:1];
+	[self addChild: outScene z:0];
 }
 
 -(void) step: (ccTime) dt {
@@ -72,8 +83,11 @@ enum {
 	// enable events while transitions
 	[[Director sharedDirector] setEventsEnabled: YES];
 	
-	[self remove: inScene];
-	[self remove: outScene];
+	// issue #267
+	[outScene setVisible:YES];
+
+	[self removeChild:inScene cleanup:NO];
+	[self removeChild:outScene cleanup:NO];
 	
 	inScene = nil;
 	outScene = nil;
@@ -83,13 +97,13 @@ enum {
 {
 	/* clean up */	
 	[inScene setVisible:YES];
-	[inScene setPosition:cpv(0,0)];
+	[inScene setPosition:ccp(0,0)];
 	[inScene setScale:1.0f];
 	[inScene setRotation:0.0f];
 	[inScene.camera restore];
 	
 	[outScene setVisible:NO];
-	[outScene setPosition:cpv(0,0)];
+	[outScene setPosition:ccp(0,0)];
 	[outScene setScale:1.0f];
 	[outScene setRotation:0.0f];
 	[outScene.camera restore];
@@ -99,6 +113,13 @@ enum {
 
 	[self schedule:@selector(step:) interval:0];
 }
+
+-(void) hideOutShowIn
+{
+	[inScene setVisible:YES];
+	[outScene setVisible:NO];
+}
+
 
 -(void) dealloc
 {
@@ -132,13 +153,13 @@ enum {
 -(void) onEnter
 {
 	[super onEnter];
-	CGRect s = [[Director sharedDirector] winSize];
+	CGSize s = [[Director sharedDirector] winSize];
 	
 	[inScene setScale:0.001f];
 	[outScene setScale:1.0f];
 	
-	[inScene setTransformAnchor: cpv( s.size.width/2, s.size.height/2) ];
-	[outScene setTransformAnchor: cpv( s.size.width/2, s.size.height/2) ];
+	[inScene setTransformAnchor: ccp( s.width/2, s.height/2) ];
+	[outScene setTransformAnchor: ccp( s.width/2, s.height/2) ];
 	
 	IntervalAction *rotozoom = [Sequence actions: [Spawn actions:
 								   [ScaleBy actionWithDuration:duration/2 scale:0.001f],
@@ -148,8 +169,8 @@ enum {
 							nil];
 	
 	
-	[outScene do: rotozoom];
-	[inScene do: [Sequence actions:
+	[outScene runAction: rotozoom];
+	[inScene runAction: [Sequence actions:
 					[rotozoom reverse],
 					[CallFunc actionWithTarget:self selector:@selector(finish)],
 				  nil]];
@@ -163,15 +184,15 @@ enum {
 -(void) onEnter
 {
 	[super onEnter];
-	CGRect s = [[Director sharedDirector] winSize];
+	CGSize s = [[Director sharedDirector] winSize];
 	
 	[inScene setScale:0.5f];
-	[inScene setPosition:cpv( s.size.width,0 )];
+	[inScene setPosition:ccp( s.width,0 )];
 	
-	[inScene setTransformAnchor: cpv( s.size.width/2, s.size.height/2) ];
-	[outScene setTransformAnchor: cpv( s.size.width/2, s.size.height/2) ];
+	[inScene setTransformAnchor: ccp( s.width/2, s.height/2) ];
+	[outScene setTransformAnchor: ccp( s.width/2, s.height/2) ];
 
-	IntervalAction *jump = [JumpBy actionWithDuration:duration/4 position:cpv(-s.size.width,0) height:s.size.width/4 jumps:2];
+	IntervalAction *jump = [JumpBy actionWithDuration:duration/4 position:ccp(-s.width,0) height:s.width/4 jumps:2];
 	IntervalAction *scaleIn = [ScaleTo actionWithDuration:duration/4 scale:1.0f];
 	IntervalAction *scaleOut = [ScaleTo actionWithDuration:duration/4 scale:0.5f];
 	
@@ -180,8 +201,8 @@ enum {
 	
 	IntervalAction *delay = [DelayTime actionWithDuration:duration/2];
 	
-	[outScene do: jumpZoomOut];
-	[inScene do: [Sequence actions: delay,
+	[outScene runAction: jumpZoomOut];
+	[inScene runAction: [Sequence actions: delay,
 								jumpZoomIn,
 								[CallFunc actionWithTarget:self selector:@selector(finish)],
 								nil] ];
@@ -200,21 +221,21 @@ enum {
 	
 	IntervalAction *a = [self action];
 
-	[inScene do: [Sequence actions:
-		[Accelerate actionWithAction:a rate:0.5],
+	[inScene runAction: [Sequence actions:
+		[EaseOut actionWithAction:a rate:2.0f],
 		[CallFunc actionWithTarget:self selector:@selector(finish)],
 		nil] ];
 	 		
 }
 -(IntervalAction*) action
 {
-	return [MoveTo actionWithDuration:duration position:cpv(0,0)];
+	return [MoveTo actionWithDuration:duration position:ccp(0,0)];
 }
 
 -(void) initScenes
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	[inScene setPosition: cpv( -s.size.width,0) ];
+	CGSize s = [[Director sharedDirector] winSize];
+	[inScene setPosition: ccp( -s.width,0) ];
 }
 @end
 
@@ -224,8 +245,8 @@ enum {
 @implementation MoveInRTransition
 -(void) initScenes
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	[inScene setPosition: cpv( s.size.width,0) ];
+	CGSize s = [[Director sharedDirector] winSize];
+	[inScene setPosition: ccp( s.width,0) ];
 }
 @end
 
@@ -235,8 +256,8 @@ enum {
 @implementation MoveInTTransition
 -(void) initScenes
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	[inScene setPosition: cpv( 0, s.size.height) ];
+	CGSize s = [[Director sharedDirector] winSize];
+	[inScene setPosition: ccp( 0, s.height) ];
 }
 @end
 
@@ -246,8 +267,8 @@ enum {
 @implementation MoveInBTransition
 -(void) initScenes
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	[inScene setPosition: cpv( 0, -s.size.height) ];
+	CGSize s = [[Director sharedDirector] winSize];
+	[inScene setPosition: ccp( 0, -s.height) ];
 }
 @end
 
@@ -264,9 +285,9 @@ enum {
 	IntervalAction *in = [self action];
 	IntervalAction *out = [in copy];
 
-	[inScene do: [Accelerate actionWithAction:in rate:0.5] ];
-	[outScene do: [Sequence actions:
-				   [Accelerate actionWithAction:out rate:0.5],
+	[inScene runAction: [EaseOut actionWithAction:in rate:2.0f]];
+	[outScene runAction: [Sequence actions:
+				   [EaseOut actionWithAction:out rate:2.0f],
 				   [CallFunc actionWithTarget:self selector:@selector(finish)],
 				   nil] ];
 	
@@ -275,14 +296,14 @@ enum {
 
 -(IntervalAction*) action
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	return [MoveBy actionWithDuration:duration position:cpv(s.size.width,0)];
+	CGSize s = [[Director sharedDirector] winSize];
+	return [MoveBy actionWithDuration:duration position:ccp(s.width,0)];
 }
 
 -(void) initScenes
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	[inScene setPosition: cpv( -s.size.width,0) ];
+	CGSize s = [[Director sharedDirector] winSize];
+	[inScene setPosition: ccp( -s.width,0) ];
 }
 @end
 
@@ -292,14 +313,14 @@ enum {
 @implementation SlideInRTransition
 -(void) initScenes
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	[inScene setPosition: cpv( s.size.width,0) ];
+	CGSize s = [[Director sharedDirector] winSize];
+	[inScene setPosition: ccp( s.width,0) ];
 }
 
 -(IntervalAction*) action
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	return [MoveBy actionWithDuration:duration position:cpv(-s.size.width,0)];
+	CGSize s = [[Director sharedDirector] winSize];
+	return [MoveBy actionWithDuration:duration position:ccp(-s.width,0)];
 }
 
 @end
@@ -310,14 +331,14 @@ enum {
 @implementation SlideInTTransition
 -(void) initScenes
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	[inScene setPosition: cpv(0,s.size.height) ];
+	CGSize s = [[Director sharedDirector] winSize];
+	[inScene setPosition: ccp(0,s.height) ];
 }
 
 -(IntervalAction*) action
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	return [MoveBy actionWithDuration:duration position:cpv(0,-s.size.height)];
+	CGSize s = [[Director sharedDirector] winSize];
+	return [MoveBy actionWithDuration:duration position:ccp(0,-s.height)];
 }
 
 @end
@@ -328,14 +349,14 @@ enum {
 @implementation SlideInBTransition
 -(void) initScenes
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	[inScene setPosition: cpv(0,-s.size.height) ];
+	CGSize s = [[Director sharedDirector] winSize];
+	[inScene setPosition: ccp(0,-s.height) ];
 }
 
 -(IntervalAction*) action
 {
-	CGRect s = [[Director sharedDirector] winSize];
-	return [MoveBy actionWithDuration:duration position:cpv(0,s.size.height)];
+	CGSize s = [[Director sharedDirector] winSize];
+	return [MoveBy actionWithDuration:duration position:ccp(0,s.height)];
 }
 @end
 
@@ -347,21 +368,21 @@ enum {
 {
 	[super onEnter];
 	
-	CGRect s = [[Director sharedDirector] winSize];
+	CGSize s = [[Director sharedDirector] winSize];
 	
 	[inScene setScale:0.001f];
 	[outScene setScale:1.0f];
 	
-	[inScene setTransformAnchor:cpv(2*s.size.width/3,s.size.height/2) ];
-	[outScene setTransformAnchor:cpv(s.size.width/3,s.size.height/2) ];
+	[inScene setTransformAnchor:ccp(2*s.width/3,s.height/2) ];
+	[outScene setTransformAnchor:ccp(s.width/3,s.height/2) ];
 	
 	
 	IntervalAction *scaleOut = [ScaleTo actionWithDuration:duration scale:0.01f];
 	IntervalAction *scaleIn = [ScaleTo actionWithDuration:duration scale:1.0f];
 
-	[inScene do: [Accelerate actionWithAction:scaleIn rate:0.5] ];
-	[outScene do: [Sequence actions:
-					[Accelerate actionWithAction:scaleOut rate:0.5],
+	[inScene runAction: [EaseOut actionWithAction:scaleIn rate:2.0f]];
+	[outScene runAction: [Sequence actions:
+					[EaseOut actionWithAction:scaleOut rate:2.0f],
 					[CallFunc actionWithTarget:self selector:@selector(finish)],
 					nil] ];
 }
@@ -404,8 +425,8 @@ enum {
 			[DelayTime actionWithDuration:duration/2],							
 			nil ];
 	
-	[inScene do: inA];
-	[outScene do: outA];
+	[inScene runAction: inA];
+	[outScene runAction: outA];
 	
 }
 @end
@@ -447,8 +468,8 @@ enum {
 			[DelayTime actionWithDuration:duration/2],							
 			nil ];
 	
-	[inScene do: inA];
-	[outScene do: outA];
+	[inScene runAction: inA];
+	[outScene runAction: outA];
 	
 }
 @end
@@ -490,8 +511,8 @@ enum {
 				[DelayTime actionWithDuration:duration/2],							
 				nil ];
 
-	[inScene do: inA];
-	[outScene do: outA];
+	[inScene runAction: inA];
+	[outScene runAction: outA];
 }
 @end
 
@@ -532,15 +553,15 @@ enum {
 	outA = [Sequence actions:
 			[Spawn actions:
 			 [OrbitCamera actionWithDuration: duration/2 radius: 1 deltaRadius:0 angleZ:outAngleZ deltaAngleZ:outDeltaZ angleX:0 deltaAngleX:0],
-			 [ScaleTo actionWithDuration:duration/2 scale:0.5],
+			 [ScaleTo actionWithDuration:duration/2 scale:0.5f],
 			 nil],
 			[Hide action],
 			[DelayTime actionWithDuration:duration/2],							
 			nil ];
 	
 	inScene.scale = 0.5f;
-	[inScene do: inA];
-	[outScene do: outA];
+	[inScene runAction: inA];
+	[outScene runAction: outA];
 }
 @end
 
@@ -582,15 +603,15 @@ enum {
 	outA = [Sequence actions:
 				[Spawn actions:
 				 [OrbitCamera actionWithDuration: duration/2 radius: 1 deltaRadius:0 angleZ:outAngleZ deltaAngleZ:outDeltaZ angleX:90 deltaAngleX:0],
-				 [ScaleTo actionWithDuration:duration/2 scale:0.5],
+				 [ScaleTo actionWithDuration:duration/2 scale:0.5f],
 				 nil],							
 				[Hide action],
 				[DelayTime actionWithDuration:duration/2],							
 				nil ];
 
-	inScene.scale = 0.5;
-	[inScene do: inA];
-	[outScene do: outA];
+	inScene.scale = 0.5f;
+	[inScene runAction: inA];
+	[outScene runAction: outA];
 }
 @end
 
@@ -633,15 +654,15 @@ enum {
 	outA = [Sequence actions:
 			[Spawn actions:
 			 [OrbitCamera actionWithDuration: duration/2 radius: 1 deltaRadius:0 angleZ:outAngleZ deltaAngleZ:outDeltaZ angleX:45 deltaAngleX:0],
-			 [ScaleTo actionWithDuration:duration/2 scale:0.5],
+			 [ScaleTo actionWithDuration:duration/2 scale:0.5f],
 			 nil],							
 			[Hide action],
 			[DelayTime actionWithDuration:duration/2],							
 			nil ];
 	
-	inScene.scale = 0.5;
-	[inScene do: inA];
-	[outScene do: outA];
+	inScene.scale = 0.5f;
+	[inScene runAction: inA];
+	[outScene runAction: outA];
 }
 @end
 
@@ -650,17 +671,36 @@ enum {
 // Fade Transition
 //
 @implementation FadeTransition
++(id) transitionWithDuration:(ccTime)d scene:(Scene*)s withColorRGB:(unsigned int)rgb
+{
+	return [[[self alloc] initWithDuration:d scene:s withColorRGB:rgb] autorelease];
+}
+
+-(id) initWithDuration:(ccTime)d scene:(Scene*)s withColorRGB:(unsigned int)rgb
+{
+	self = [super initWithDuration:d scene:s];
+	if( self ) 
+		RGBA = rgb << 8;
+	
+	return self;
+}
+
+-(id) initWithDuration:(ccTime)d scene:(Scene*)s
+{
+	return [self initWithDuration:d scene:s withColorRGB:0x00000000];
+}
+
 -(void) onEnter
 {
 	[super onEnter];
 	
-	ColorLayer *l = [ColorLayer layerWithColor: 0x00000000];
+	ColorLayer *l = [ColorLayer layerWithColor:RGBA];
 	[inScene setVisible: NO];
 	
-	[self add: l z:2 tag:kSceneFade];
+	[self addChild: l z:2 tag:kSceneFade];
 	
 	
-	CocosNode *f = [self getByTag:kSceneFade];
+	CocosNode *f = [self getChildByTag:kSceneFade];
 
 	IntervalAction *a = [Sequence actions:
 							[FadeIn actionWithDuration:duration/2],
@@ -668,20 +708,160 @@ enum {
 							[FadeOut actionWithDuration:duration/2],
 							[CallFunc actionWithTarget:self selector:@selector(finish)],
 						 nil ];
-	[f do: a];
+	[f runAction: a];
 }
 
 -(void) onExit
 {
 	[super onExit];
-	[self removeByTag:kSceneFade];
-}
-
--(void) hideOutShowIn
-{
-	[inScene setVisible:YES];
-	[outScene setVisible:NO];
+	[self removeChildByTag:kSceneFade cleanup:NO];
 }
 @end
+
+//
+// TurnOffTilesTransition
+//
+@implementation TurnOffTilesTransition
+
+// override addScenes, and change the order
+-(void) addScenes
+{
+	// add both scenes
+	[self addChild: inScene z:0];
+	[self addChild: outScene z:1];
+}
+
+-(void) onEnter
+{
+	[super onEnter];
+	CGSize s = [[Director sharedDirector] winSize];
+	float aspect = s.width / s.height;
+	int x = 12 * aspect;
+	int y = 12;
+	
+	id toff = [TurnOffTiles actionWithSize: ccg(x,y) duration:duration];
+	[outScene runAction: [Sequence actions: toff,
+				   [CallFunc actionWithTarget:self selector:@selector(finish)],
+				   [StopGrid action],
+				   nil]
+	 ];
+
+}
+@end
+
+#pragma mark Split Transitions
+
+//
+// SplitCols Transition
+//
+@implementation SplitColsTransition
+
+-(void) onEnter
+{
+	[super onEnter];
+
+	inScene.visible = NO;
+	
+	id split = [self action];
+	id seq = [Sequence actions:
+				split,
+				[CallFunc actionWithTarget:self selector:@selector(hideOutShowIn)],
+				[split reverse],
+				nil
+			  ];
+	[self runAction: [Sequence actions:
+			   [EaseInOut actionWithAction:seq rate:3.0f],
+			   [CallFunc actionWithTarget:self selector:@selector(finish)],
+			   [StopGrid action],
+			   nil]
+	 ];
+}
+
+-(IntervalAction*) action
+{
+	return [SplitCols actionWithCols:3 duration:duration/2.0f];
+}
+@end
+
+//
+// SplitRows Transition
+//
+@implementation SplitRowsTransition
+-(IntervalAction*) action
+{
+	return [SplitRows actionWithRows:3 duration:duration/2.0f];
+}
+@end
+
+
+#pragma mark Fade Grid Transitions
+
+//
+// FadeTR Transition
+//
+@implementation FadeTRTransition
+// override addScenes, and change the order
+-(void) addScenes
+{
+	// add both scenes
+	[self addChild: inScene z:0];
+	[self addChild: outScene z:1];
+}
+
+-(void) onEnter
+{
+	[super onEnter];
+	
+	CGSize s = [[Director sharedDirector] winSize];
+	float aspect = s.width / s.height;
+	int x = 12 * aspect;
+	int y = 12;
+	
+	id action  = [self actionWithSize:ccg(x,y)];
+
+	[outScene runAction: [Sequence actions:
+					action,
+				    [CallFunc actionWithTarget:self selector:@selector(finish)],
+				    [StopGrid action],
+				    nil]
+	 ];
+}
+
+-(IntervalAction*) actionWithSize: (ccGridSize) v
+{
+	return [FadeOutTRTiles actionWithSize:v duration:duration];
+}
+@end
+
+//
+// FadeBL Transition
+//
+@implementation FadeBLTransition
+-(IntervalAction*) actionWithSize: (ccGridSize) v
+{
+	return [FadeOutBLTiles actionWithSize:v duration:duration];
+}
+@end
+
+//
+// FadeUp Transition
+//
+@implementation FadeUpTransition
+-(IntervalAction*) actionWithSize: (ccGridSize) v
+{
+	return [FadeOutUpTiles actionWithSize:v duration:duration];
+}
+@end
+
+//
+// FadeDown Transition
+//
+@implementation FadeDownTransition
+-(IntervalAction*) actionWithSize: (ccGridSize) v
+{
+	return [FadeOutDownTiles actionWithSize:v duration:duration];
+}
+@end
+
 
 

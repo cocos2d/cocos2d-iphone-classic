@@ -63,6 +63,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 #import <OpenGLES/ES1/glext.h>
 
 #import "Texture2D.h"
+#import "PVRTexture.h"
 
 
 //CONSTANTS:
@@ -71,10 +72,13 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 //CLASS IMPLEMENTATIONS:
 
+// Default Min/Mag texture filter
+static ccTexParams _texParams = { GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE };
+static ccTexParams _texParamsCopy;
+
 @implementation Texture2D
 
 @synthesize contentSize=_size, pixelFormat=_format, pixelsWide=_width, pixelsHigh=_height, name=_name, maxS=_maxS, maxT=_maxT;
-
 - (id) initWithData:(const void*)data pixelFormat:(Texture2DPixelFormat)pixelFormat pixelsWide:(NSUInteger)width pixelsHigh:(NSUInteger)height contentSize:(CGSize)size
 {
 	GLint					saveName;
@@ -82,11 +86,8 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 		glGenTextures(1, &_name);
 		glGetIntegerv(GL_TEXTURE_BINDING_2D, &saveName);
 		glBindTexture(GL_TEXTURE_2D, _name);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+
+		[Texture2D applyTexParameters];
 		
 		switch(pixelFormat) {
 			
@@ -118,7 +119,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 - (void) dealloc
 {
 #if DEBUG
-	NSLog(@"deallocing: %@", self);
+	NSLog(@"deallocing %@", self);
 #endif
 	if(_name)
 		glDeleteTextures(1, &_name);
@@ -197,9 +198,9 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 	while((width > kMaxTextureSize) || (height > kMaxTextureSize)) {
 		width /= 2;
 		height /= 2;
-		transform = CGAffineTransformScale(transform, 0.5, 0.5);
-		imageSize.width *= 0.5;
-		imageSize.height *= 0.5;
+		transform = CGAffineTransformScale(transform, 0.5f, 0.5f);
+		imageSize.width *= 0.5f;
+		imageSize.height *= 0.5f;
 	}
 	
 	switch(pixelFormat) {		
@@ -254,6 +255,12 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 @implementation Texture2D (Text)
 
+- (id) initWithString:(NSString*)string fontName:(NSString*)name fontSize:(CGFloat)size
+{
+	CGSize dim = [string sizeWithFont: [UIFont fontWithName:name size:size]];
+	return [self initWithString:string dimensions:dim alignment:UITextAlignmentCenter fontName:name fontSize:size];
+}
+
 - (id) initWithString:(NSString*)string dimensions:(CGSize)dimensions alignment:(UITextAlignment)alignment fontName:(NSString*)name fontSize:(CGFloat)size
 {
 	NSUInteger				width,
@@ -265,7 +272,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 	UIFont *				font;
 	
 	font = [UIFont fontWithName:name size:size];
-	
+
 	width = dimensions.width;
 	if((width != 1) && (width & (width - 1))) {
 		i = 1;
@@ -287,9 +294,9 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 	CGColorSpaceRelease(colorSpace);
 	
 	
-	CGContextSetGrayFillColor(context, 1.0, 1.0);
-	CGContextTranslateCTM(context, 0.0, height);
-	CGContextScaleCTM(context, 1.0, -1.0); //NOTE: NSString draws in UIKit referential i.e. renders upside-down compared to CGBitmapContext referential
+	CGContextSetGrayFillColor(context, 1.0f, 1.0f);
+	CGContextTranslateCTM(context, 0.0f, height);
+	CGContextScaleCTM(context, 1.0f, -1.0f); //NOTE: NSString draws in UIKit referential i.e. renders upside-down compared to CGBitmapContext referential
 	UIGraphicsPushContext(context);
 		[string drawInRect:CGRectMake(0, 0, dimensions.width, dimensions.height) withFont:font lineBreakMode:UILineBreakModeWordWrap alignment:alignment];
 	UIGraphicsPopContext();
@@ -308,24 +315,24 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 - (void) drawAtPoint:(CGPoint)point 
 {
-	GLfloat		coordinates[] = { 0,	_maxT,
+	GLfloat		coordinates[] = { 0.0f,	_maxT,
 								_maxS,	_maxT,
-								0,		0,
-								_maxS,	0 };
+								0.0f,	0.0f,
+								_maxS,	0.0f };
 	GLfloat		width = (GLfloat)_width * _maxS,
 				height = (GLfloat)_height * _maxT;
 
 #if 0
-	GLfloat		vertices[] = {	-width / 2 + point.x,	-height / 2 + point.y,	0.0,
-								width / 2 + point.x,	-height / 2 + point.y,	0.0,
-								-width / 2 + point.x,	height / 2 + point.y,	0.0,
-								width / 2 + point.x,	height / 2 + point.y,	0.0 };
+	GLfloat		vertices[] = {	-width / 2 + point.x,	-height / 2 + point.y,	0.0f,
+								width / 2 + point.x,	-height / 2 + point.y,	0.0f,
+								-width / 2 + point.x,	height / 2 + point.y,	0.0f,
+								width / 2 + point.x,	height / 2 + point.y,	0.0f };
 	
 #else // anchor is done by cocos2d automagically
-	GLfloat		vertices[] = {	point.x,			point.y,	0.0,
-								width + point.x,	point.y,	0.0,
-								point.x,			height  + point.y,	0.0,
-								width + point.x,	height  + point.y,	0.0 };
+	GLfloat		vertices[] = {	point.x,			point.y,	0.0f,
+								width + point.x,	point.y,	0.0f,
+								point.x,			height  + point.y,	0.0f,
+								width + point.x,	height  + point.y,	0.0f };
 #endif
 	
 	glBindTexture(GL_TEXTURE_2D, _name);
@@ -337,17 +344,17 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 - (void) drawInRect:(CGRect)rect
 {
-	GLfloat	 coordinates[] = {  0,		_maxT,
+	GLfloat	 coordinates[] = {  0.0f,	_maxT,
 								_maxS,	_maxT,
-								0,		0,
-								_maxS,	0  };
-	GLfloat	vertices[] = {	rect.origin.x,							rect.origin.y,							0.0,
-							rect.origin.x + rect.size.width,		rect.origin.y,							0.0,
-							rect.origin.x,							rect.origin.y + rect.size.height,		0.0,
-							rect.origin.x + rect.size.width,		rect.origin.y + rect.size.height,		0.0 };
+								0.0f,	0.0f,
+								_maxS,	0.0f  };
+	GLfloat	vertices[] = {	rect.origin.x,							rect.origin.y,							/*0.0f,*/
+							rect.origin.x + rect.size.width,		rect.origin.y,							/*0.0f,*/
+							rect.origin.x,							rect.origin.y + rect.size.height,		/*0.0f,*/
+							rect.origin.x + rect.size.width,		rect.origin.y + rect.size.height,		/*0.0f*/ };
 	
 	glBindTexture(GL_TEXTURE_2D, _name);
-	glVertexPointer(3, GL_FLOAT, 0, vertices);
+	glVertexPointer(2, GL_FLOAT, 0, vertices);
 	glTexCoordPointer(2, GL_FLOAT, 0, coordinates);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -363,11 +370,8 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 		glGenTextures(1, &_name);
 		glGetIntegerv(GL_TEXTURE_BINDING_2D, &saveName);
 		glBindTexture(GL_TEXTURE_2D, _name);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		[Texture2D applyTexParameters];
 		
 		GLenum format;
 		GLsizei size = length * length * bpp / 8;
@@ -386,10 +390,74 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 		_size = CGSizeMake(length, length);
 		_width = length;
 		_height = length;
-		_maxS = 1.0;
-		_maxT = 1.0;
+		_maxS = 1.0f;
+		_maxT = 1.0f;
 	}					
 	return self;
 }
+
+-(id) initWithPVRTCFile: (NSString*) file
+{
+
+	if( (self = [super init]) ) {
+		PVRTexture *pvr = [[PVRTexture alloc] initWithContentsOfFile:file];
+		pvr.retainName = YES;	// don't dealloc texture on release
+		
+		_name = pvr.name;	// texture id
+		_maxS = 1.0f;
+		_maxT = 1.0f;
+		_width = pvr.width;		// width
+		_height = pvr.height;	// height
+		_size = CGSizeMake(_width, _height);
+
+		[pvr release];
+	}
+	return self;
+}
+@end
+
+//
+// Use to apply MIN/MAG filter
+//
+@implementation Texture2D (GLFilter)
+
++(void) setTexParameters: (ccTexParams*) texParams
+{
+	_texParams = *texParams;
+}
+
++(ccTexParams) texParameters
+{
+	return _texParams;
+}
+
++(void) applyTexParameters
+{
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, _texParams.minFilter );
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, _texParams.magFilter );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, _texParams.wrapS );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, _texParams.wrapT );
+}
+
++(void) restoreTexParameters
+{
+	_texParams = _texParamsCopy;
+}
+
++(void) saveTexParameters
+{
+	_texParamsCopy = _texParams;
+}
+
++(void) setAliasTexParameters
+{
+	_texParams.magFilter = _texParams.minFilter = GL_NEAREST;
+}
+
++(void) setAntiAliasTexParameters
+{
+	_texParams.magFilter = _texParams.minFilter = GL_LINEAR;
+}
+
 @end
 

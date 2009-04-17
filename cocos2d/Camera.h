@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -17,7 +17,7 @@
 #import "CocosNode.h"
 
 /** 
-    A Camera is used in every `CocosNode`.
+    A Camera is used in every CocosNode.
     Useful to look at the object from different views.
     The OpenGL gluLookAt() function is used to locate the
     camera.
@@ -41,6 +41,8 @@
 	
 	BOOL dirty;
 }
+
+@property BOOL dirty;
 
 /** returns the Z eye */
 +(float) getZEye;

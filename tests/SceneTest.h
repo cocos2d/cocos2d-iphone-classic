@@ -1,30 +1,28 @@
-#import <UIKit/UIKit.h>
 #import "cocos2d.h"
 
-@class Menu;
-
 //CLASS INTERFACE
-@interface AppController : NSObject <UIAccelerometerDelegate, UIAlertViewDelegate, UITextFieldDelegate>
+@interface AppController : NSObject <UIAccelerometerDelegate, UIAlertViewDelegate, UITextFieldDelegate, UIApplicationDelegate>
 {
+	UIWindow	*window;
 }
 @end
 
 
 @interface Layer1 : Layer
 {
-	Menu * menu;
 }
--(void) onOptions: (id) sender;
+-(void) onPushScene: (id) sender;
+-(void) onPushSceneTran: (id) sender;
 -(void) onVoid: (id) sender;
 -(void) onQuit: (id) sender;
 @end
 
 @interface Layer2 : Layer
 {
-	Menu * menu;
 }
 -(void) onGoBack: (id) sender;
--(void) onFullscreen: (id) sender;
+-(void) onReplaceScene: (id) sender;
+-(void) onReplaceSceneTran: (id) sender;
 @end
 
 @interface Layer3: ColorLayer

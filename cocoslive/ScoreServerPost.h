@@ -22,13 +22,15 @@
 #import "cocoslive.h"
 
 // Score Server protocol version
-#define SCORE_SERVER_PROTOCOL_VERSION @"1.0"
+#define SCORE_SERVER_PROTOCOL_VERSION @"1.1"
 
 // Server URL
 #ifdef USE_LOCAL_SERVER
 #define SCORE_SERVER_SEND_URL @"http://localhost:8080/api/post-score"
+#define SCORE_SERVER_UPDATE_URL @"http://localhost:8080/api/update-score"
 #else
 #define SCORE_SERVER_SEND_URL @"http://www.cocoslive.net/api/post-score"
+#define SCORE_SERVER_UPDATE_URL @"http://www.cocoslive.net/api/update-score"
 #endif
 
 /// Type of errors from the Post Score request
@@ -70,19 +72,28 @@ typedef enum {
 	CC_MD5_CTX		md5Ctx;
 }
 
+@property (readonly) tPostStatus postStatus;
+
 /** creates a cocos server with a game name and a game key */
 +(id) serverWithGameName:(NSString*) name gameKey:(NSString*) key delegate:(id)delegate;
 
 /** initializes a cocos server with a game name and a game key */
 -(id) initWithGameName:(NSString*) name gameKey:(NSString*) key delegate:(id)delegate;
 
-/** send the scores to the server */
+/** send the scores to the server. A new entre will be created on the server */
 -(BOOL) sendScore: (NSDictionary*) dict;
+
+/** 
+ * Sends a score dictionary to the server for updating an existing entry by playername and device id, or creating a new one.
+ * The passed dictionary must contain a cc_playername key, otherwise it will raise and exception.
+ * @since v0.7.1
+ */
+-(BOOL) updateScore: (NSDictionary*) dict;
 
 @end
 
-/** CocosLiveConnection protocol */
-@protocol CocosLiveConnection
--(void) scoreRequestOk:(id) sender;
--(void) scoreRequestFail:(id) sender;
+/** CocosLivePost protocol */
+@protocol CocosLivePostDelegate <NSObject>
+-(void) scorePostOk:(id) sender;
+-(void) scorePostFail:(id) sender;
 @end

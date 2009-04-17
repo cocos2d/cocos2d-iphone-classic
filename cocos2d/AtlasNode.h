@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -15,8 +15,17 @@
 #import "TextureAtlas.h"
 #import "CocosNode.h"
 
-/** An Atlas node. Knows how to render Atlas */
-@interface AtlasNode :CocosNode <CocosNodeOpacity, CocosNodeSize> {
+/** AtlasNode is a subclass of CocosNode that implements CocosNodeOpacity, CocosNodeRGB and
+ CocosNodeSize protocols.
+ 
+ It knows how to render a TextureAtlas object.
+ 
+ All features from CocosNode are valid, plus the following features:
+ - opacity
+ - color (setRGB:::)
+ - contentSize
+ */
+@interface AtlasNode : CocosNode <CocosNodeOpacity, CocosNodeRGB, CocosNodeSize> {
 	
 	/// texture atlas
 	TextureAtlas	*textureAtlas;
@@ -43,8 +52,8 @@
 	
 }
 
-/// property of opacity. Conforms to CocosNodeOpacity protocol
-@property (readwrite,assign) GLubyte opacity;
+/// Conforms to CocosNodeOpacity and CocosNodeRGB protocol
+@property (readwrite,assign) GLubyte opacity, r, g, b;
 
 
 /** creates an AtlasNode  with an Atlas file the width and height of each item and the quantity of items to render*/
@@ -56,17 +65,5 @@
 /** updates the Atlas (indexed vertex array).
  * Shall be overriden in subclasses
  */
--(void) updateAltasValues;
-
-
-/** set the color of the texture.
- * example:  [node setRGB: 255:128:25];
- */
--(void) setRGB: (GLubyte)r :(GLubyte)g :(GLubyte)b;
-
-/** returns the content size of the Atlas in pixels
- * Conforms to CocosNodeSize protocol
- */
--(CGSize) contentSize;
-
+-(void) updateAtlasValues;
 @end

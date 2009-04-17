@@ -18,7 +18,7 @@
 // local imports
 #import "ScoreServerPost.h"
 #import "ScoreServerRequest.h"
-
+#import "ccMacros.h"
 
 @implementation ScoreServerRequest
 +(id) serverWithGameName:(NSString*) name delegate:(id)delegate
@@ -39,9 +39,7 @@
 
 -(void) dealloc
 {
-#if DEBUG
-	NSLog( @"deallocing %@", self);
-#endif
+	CCLOG( @"deallocing %@", self);
 
 	[delegate release];
 	[gameName release];
@@ -58,21 +56,30 @@
 	// create the request	
 	[receivedData setLength:0];
 	
+	
+	NSString *device = @"";
+	if( flags & kQueryFlagByDevice )
+		device = [[UIDevice currentDevice] uniqueIdentifier];
+
 	// arguments:
 	//  query: type of query
 	//  limit: how many scores are being requested. Default is 25. Maximun is 100
 	//  offset: offset of the scores
 	//  flags: bring only country scores, world scores, etc.
 	//  category: string user defined string used to filter
-	NSString *url= [NSString stringWithFormat:@"%@?gamename=%@&querytype=%d&offset=%d&limit=%d&flags=%d&category=%@",
+	NSString *url= [NSString stringWithFormat:@"%@?gamename=%@&querytype=%d&offset=%d&limit=%d&flags=%d&category=%@&device=%@",
 					SCORE_SERVER_REQUEST_URL,
 					gameName,
 					type,
 					offset,
 					limit,
 					flags,
-					category];
-		
+					[category stringByAddingPercentEscapesUsingEncoding: NSUTF8StringEncoding],
+					device
+	];
+	
+//	NSLog(@"%@", url);
+
 	NSURLRequest *request=[NSURLRequest requestWithURL:[NSURL URLWithString:url]
 										   cachePolicy:NSURLRequestUseProtocolCachePolicy
 											timeoutInterval:10.0];
@@ -82,6 +89,9 @@
 	NSURLConnection *theConnection=[[NSURLConnection alloc] initWithRequest:request delegate:self];
 	if (! theConnection)
 		return NO;
+
+	// XXX: Don't release 'theConnection' here
+	// XXX: It will be released by the delegate
 	
 	return YES;
 }
@@ -114,7 +124,7 @@
 	if( ! error ) {
 		array = [dictionary objectForKey:@"scores"];
 	} else {
-		NSLog(@"Error parsing scores: %@", error);
+		CCLOG(@"Error parsing scores: %@", error);
 	}
 	return array;
 }
@@ -146,7 +156,7 @@
 	// release the connection, and the data object
     [connection release];
 
-	NSLog(@"Error getting scores: %@", error);
+	CCLOG(@"Error getting scores: %@", error);
 
 	if( [delegate respondsToSelector:@selector(scoreRequestFail:) ] )
 		[delegate scoreRequestFail:self];

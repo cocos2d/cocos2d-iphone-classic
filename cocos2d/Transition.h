@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -29,7 +29,7 @@ typedef enum {
 	kOrientationDownOver = 1,
 } tOrientation;
 
-/** Base class for actions
+/** Base class for Transition scenes
  */
 @interface TransitionScene : Scene {
 	Scene * inScene;
@@ -42,6 +42,8 @@ typedef enum {
 -(id) initWithDuration:(ccTime) t scene:(Scene*)s;
 /** called after the transition finishes */
 -(void) finish;
+/** used by some transitions to hide the outter scene */
+-(void) hideOutShowIn;
 @end
 
 /** A Transition that supports orientation like.
@@ -62,126 +64,112 @@ typedef enum {
  Rotate and zoom out the outgoing scene, and then rotate and zoom in the incoming 
  */
 @interface RotoZoomTransition : TransitionScene
-{
-}
+{}
 @end
 
-/** JumpZoom Transition
+/** JumpZoom Transition.
  Zoom out and jump the outgoing scene, and then jump and zoom in the incoming 
 */
 @interface JumpZoomTransition : TransitionScene
-{
-}
+{}
 @end
 
-/** MoveInL Transition
+/** MoveInL Transition.
  Move in from to the left the incoming scene.
 */
 @interface MoveInLTransition : TransitionScene
-{
-}
+{}
 /** initializes the scenes */
 -(void) initScenes;
 /** returns the action that will be performed */
 -(IntervalAction*) action;
 @end
 
-/** MoveInR Transition
+/** MoveInR Transition.
  Move in from to the right the incoming scene.
  */
 @interface MoveInRTransition : MoveInLTransition
-{
-}
+{}
 @end
 
-/** MoveInT Transition
+/** MoveInT Transition.
  Move in from to the top the incoming scene.
  */
 @interface MoveInTTransition : MoveInLTransition
-{
-}
+{}
 @end
 
-/** MoveInB Transition
+/** MoveInB Transition.
  Move in from to the bottom the incoming scene.
  */
 @interface MoveInBTransition : MoveInLTransition
-{
-}
+{}
 @end
 
-/** SlideInL Transition
+/** SlideInL Transition.
  Slide in the incoming scene from the left border.
  */
 @interface SlideInLTransition : TransitionScene
-{
-}
+{}
 /** initializes the scenes */
 -(void) initScenes;
 /** returns the action that will be performed */
 -(IntervalAction*) action;
 @end
 
-/** SlideInR Transition
+/** SlideInR Transition.
  Slide in the incoming scene from the right border.
  */
 @interface SlideInRTransition : SlideInLTransition
-{
-}
+{}
 @end
 
-/** SlideInB Transition
+/** SlideInB Transition.
  Slide in the incoming scene from the bottom border.
  */
 @interface SlideInBTransition : SlideInLTransition
-{
-}
+{}
 @end
 
-/** SlideInT Transition
+/** SlideInT Transition.
  Slide in the incoming scene from the top border.
  */
 @interface SlideInTTransition : SlideInLTransition
-{
-}
+{}
 @end
 
 /**
  Shrink the outgoing scene while grow the incoming scene
  */
 @interface ShrinkGrowTransition : TransitionScene
-{
-}
+{}
 @end
 
-/** FlipX Transition
+/** FlipX Transition.
  Flips the screen horizontally.
  The front face is the outgoing scene and the back face is the incoming scene.
  */
 @interface FlipXTransition : OrientedTransitionScene
-{
-}
+{}
 @end
 
-/** FlipY Transition
+/** FlipY Transition.
  Flips the screen vertically.
  The front face is the outgoing scene and the back face is the incoming scene.
  */
 @interface FlipYTransition : OrientedTransitionScene
-{
-}
+{}
 @end
 
-/** FlipAngular Transition
+/** FlipAngular Transition.
  Flips the screen half horizontally and half vertically.
  The front face is the outgoing scene and the back face is the incoming scene.
  */
 @interface FlipAngularTransition : OrientedTransitionScene
-{
-}
+{}
 @end
 
-/** ZoomFlipX Transition
+/** ZoomFlipX Transition.
  Flips the screen horizontally doing a zoom out/in
  The front face is the outgoing scene and the back face is the incoming scene.
  */
@@ -190,29 +178,84 @@ typedef enum {
 }
 @end
 
-/** ZoomFlipY Transition
+/** ZoomFlipY Transition.
  Flips the screen vertically doing a little zooming out/in
  The front face is the outgoing scene and the back face is the incoming scene.
  */
 @interface ZoomFlipYTransition : OrientedTransitionScene
-{
-}
+{}
 @end
 
-/** ZoomFlipAngular Transition
+/** ZoomFlipAngular Transition.
  Flips the screen half horizontally and half vertically doing a little zooming out/in.
  The front face is the outgoing scene and the back face is the incoming scene.
  */
 @interface ZoomFlipAngularTransition : OrientedTransitionScene
-{
-}
+{}
 @end
 
-/** Fade Transition
+/** Fade Transition.
  Fade out the outgoing scene and then fade in the incoming scene.'''
  */
 @interface FadeTransition : TransitionScene
 {
+	unsigned int RGBA;
 }
--(void) hideOutShowIn;
+/** creates the transition with a duration and with an RGB color
+ * Example: [FadeTransition transitionWithDuration:2 scene:s withColorRGB:0xff0000]; // red color
+ */
++(id) transitionWithDuration:(ccTime)duration scene:(Scene*)scene withColorRGB:(unsigned int)rgb;
+/** initializes the transition with a duration and with an RGB color */
+-(id) initWithDuration:(ccTime)duration scene:(Scene*)scene withColorRGB:(unsigned int)rgb;
+@end
+
+/** TurnOffTiles Transition.
+ Turn off the tiles of the outgoing scene in random order
+ */
+@interface TurnOffTilesTransition : TransitionScene
+{}
+@end
+
+/** SplitCols Transition.
+ The odd columns goes upwards while the even columns goes downwards.
+ */
+@interface SplitColsTransition : TransitionScene
+{}
+-(IntervalAction*) action;
+@end
+
+/** SplitRows Transition.
+ The odd rows goes to the left while the even rows goes to the right.
+ */
+@interface SplitRowsTransition : SplitColsTransition
+{}
+@end
+
+/** FadeTRTransition.
+ Fade the tiles of the outgoing scene from the left-bottom corner the to top-right corner.
+ */
+@interface FadeTRTransition : TransitionScene
+{}
+-(IntervalAction*) actionWithSize:(ccGridSize) vector;
+@end
+
+/** FadeBLTransition.
+ Fade the tiles of the outgoing scene from the top-right corner to the bottom-left corner.
+ */
+@interface FadeBLTransition : FadeTRTransition
+{}
+@end
+
+/** FadeUp Transition.
+ * Fade the tiles of the outgoing scene from the bottom to the top.
+ */
+@interface FadeUpTransition : FadeTRTransition
+{}
+@end
+
+/** FadeDown Transition.
+ * Fade the tiles of the outgoing scene from the top to the bottom.
+ */
+@interface FadeDownTransition : FadeTRTransition
+{}
 @end

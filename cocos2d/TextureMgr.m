@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -12,15 +12,10 @@
  *
  */
 
-#import <QuartzCore/QuartzCore.h>
-#import <OpenGLES/EAGLDrawable.h>
-#import <UIKit/UIKit.h>
-#import <OpenGLES/EAGL.h>
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
-
-#import "Texture2D.h"
 #import "TextureMgr.h"
+#import "Support/FileUtils.h"
+#import "Support/Texture2D.h"
+
 
 @implementation TextureMgr
 //
@@ -30,7 +25,7 @@ static TextureMgr *sharedTextureMgr;
 
 + (TextureMgr *)sharedTextureMgr
 {
-	@synchronized(self)
+	@synchronized([TextureMgr class])
 	{
 		if (!sharedTextureMgr)
 			[[TextureMgr alloc] init];
@@ -43,7 +38,7 @@ static TextureMgr *sharedTextureMgr;
 
 +(id)alloc
 {
-	@synchronized(self)
+	@synchronized([TextureMgr class])
 	{
 		NSAssert(sharedTextureMgr == nil, @"Attempted to allocate a second instance of a singleton.");
 		sharedTextureMgr = [super alloc];
@@ -55,10 +50,9 @@ static TextureMgr *sharedTextureMgr;
 
 -(id) init
 {
-	if( ! (self=[super init]) )
-		return nil;
-	
-	textures = [[NSMutableDictionary dictionaryWithCapacity: 10] retain];
+	if( (self=[super init]) )
+		textures = [[NSMutableDictionary dictionaryWithCapacity: 10] retain];
+
 	return self;
 }
 
@@ -68,46 +62,71 @@ static TextureMgr *sharedTextureMgr;
 	[super dealloc];
 }
 
--(Texture2D*) addImage: (NSString*) fileimage
+// public interfaces
+
+-(Texture2D*) addImage: (NSString*) path
 {
-	NSAssert(fileimage != nil, @"TextureMgr: fileimage MUST not be nill");
+	NSAssert(path != nil, @"TextureMgr: fileimage MUST not be nill");
 
 	Texture2D * tex;
 	
-	if( (tex=[textures objectForKey: fileimage] ) ) {
+	if( (tex=[textures objectForKey: path] ) ) {
 		return tex;
 	}
+		
+	// Split up directory and filename
+	NSString *fullpath = [FileUtils fullPathFromRelativePath: path ];
+
+	// all images are handled by UIImage except PVR extension that is handled by our own handler
+	if ( [[path lowercaseString] hasSuffix:@".pvr"] )
+		return [self addPVRTCImage:fullpath];
 	
-	tex = [[Texture2D alloc] initWithImage: [UIImage imageNamed:fileimage]];
-	[textures setObject: tex forKey:fileimage];
+	tex = [ [Texture2D alloc] initWithImage: [UIImage imageWithContentsOfFile: fullpath ] ];
+
+	[textures setObject: tex forKey:path];
 	
 	return [tex autorelease];
 }
 
--(Texture2D*) addPVRTCImage: (NSString*) fileimage bpp:(int)bpp hasAlpha:(BOOL)alpha width:(int)w
+-(Texture2D*) addPVRTCImage: (NSString*) path bpp:(int)bpp hasAlpha:(BOOL)alpha width:(int)w
 {
-	NSAssert(fileimage != nil, @"TextureMgr: fileimage MUST not be nill");
+	NSAssert(path != nil, @"TextureMgr: fileimage MUST not be nill");
 	NSAssert( bpp==2 || bpp==4, @"TextureMgr: bpp must be either 2 or 4");
 	
 	Texture2D * tex;
 	
+	if( (tex=[textures objectForKey: path] ) ) {
+		return tex;
+	}
+	
+	// Split up directory and filename
+	NSString *fullpath = [FileUtils fullPathFromRelativePath:path];
+	
+	NSData *nsdata = [[NSData alloc] initWithContentsOfFile:fullpath];
+	tex = [[Texture2D alloc] initWithPVRTCData:[nsdata bytes] level:0 bpp:bpp hasAlpha:alpha length:w];
+	[textures setObject: tex forKey:path];
+	[nsdata release];
+
+	return [tex autorelease];
+}
+
+-(Texture2D*) addPVRTCImage: (NSString*) fileimage
+{
+	NSAssert(fileimage != nil, @"TextureMgr: fileimage MUST not be nill");
+
+	Texture2D * tex;
+	
 	if( (tex=[textures objectForKey: fileimage] ) ) {
 		return tex;
 	}
 	
-	NSBundle *bundle = [NSBundle mainBundle];
-	if (bundle)  {
-		NSString *imagePath = [bundle pathForResource:fileimage ofType:nil];
-		if (imagePath) {
-			NSData *nsdata = [[NSData alloc] initWithContentsOfFile:imagePath];
-			tex = [[Texture2D alloc] initWithPVRTCData:[nsdata bytes] level:0 bpp:bpp hasAlpha:alpha length:w];
-			[textures setObject: tex forKey:fileimage];
-			[nsdata release];
-		}
-	}
-
+	tex = [[Texture2D alloc] initWithPVRTCFile: fileimage];
+	if( tex )
+		[textures setObject: tex forKey:fileimage];
+	
 	return [tex autorelease];
 }
+
 
 -(Texture2D*) addCGImage: (CGImageRef) image
 {
@@ -133,11 +152,12 @@ static TextureMgr *sharedTextureMgr;
 
 -(void) removeTexture: (Texture2D*) tex
 {
-	NSAssert(tex != nil, @"TextureMgr: tex MUST not be nill");
+	if( ! tex )
+		return;
 	
 	NSArray *keys = [textures allKeysForObject:tex];
 	
-	for( int i = 0; i < [keys count]; i++ )
+	for( NSUInteger i = 0; i < [keys count]; i++ )
 		[textures removeObjectForKey:[keys objectAtIndex:i]];
 }
 @end

@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -16,7 +16,9 @@
 // cocoa related
 #import <UIKit/UIKit.h>
 
-#import "types.h"
+#import "ccTypes.h"
+
+typedef void (*TICK_IMP)(id, SEL, ccTime);
 
 //
 // Timer
@@ -24,10 +26,14 @@
 /** Light weight timer */
 @interface Timer : NSObject
 {
-	NSInvocation* invocation;
+	id target;
+	SEL selector;
+	TICK_IMP impMethod;
+	
 	ccTime interval;
-	ccTime elapsed; 
+	ccTime elapsed;
 }
+
 @property (readwrite,assign) ccTime interval;
 
 /** constructor for timer */

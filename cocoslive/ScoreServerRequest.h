@@ -38,6 +38,7 @@ typedef enum {
 typedef enum {
 	kQueryFlagIgnore = 0,
 	kQueryFlagByCountry = 1 << 0,
+	kQueryFlagByDevice = 1 << 1,
 } tQueryFlags;
 
 /**
@@ -76,4 +77,10 @@ typedef enum {
 
 /** parse the received JSON scores and convert it to objective-c objects */
 -(NSArray*) parseScores;
+@end
+
+/** CocosLiveRequest protocol */
+@protocol CocosLiveRequestDelegate <NSObject>
+-(void) scoreRequestOk:(id) sender;
+-(void) scoreRequestFail:(id) sender;
 @end

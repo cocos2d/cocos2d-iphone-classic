@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -16,6 +16,7 @@
 // cocos2d
 #import "ParticleSystems.h"
 #import "TextureMgr.h"
+#import "Director.h"
 
 //
 // ParticleFireworks
@@ -55,7 +56,7 @@
 	position.y = 160;
 	
 	// life of particles
-	life = 3.5;
+	life = 3.5f;
 	lifeVar = 1;
 		
 	// emits per frame
@@ -66,10 +67,10 @@
 	startColor.g = 0.5f;
 	startColor.b = 0.5f;
 	startColor.a = 1.0f;
-	startColorVar.r = 0.5;
-	startColorVar.g = 0.5;
-	startColorVar.b = 0.5;
-	startColorVar.a = 0.1;
+	startColorVar.r = 0.5f;
+	startColorVar.g = 0.5f;
+	startColorVar.b = 0.5f;
+	startColorVar.a = 0.1f;
 	endColor.r = 0.1f;
 	endColor.g = 0.1f;
 	endColor.b = 0.1f;
@@ -83,8 +84,7 @@
 	size = 8.0f;
 	sizeVar = 2.0f;
 
-	texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
-	[texture retain];
+	self.texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
 
 	// additive
 	blendAdditive = NO;
@@ -130,7 +130,7 @@
 	
 	// life of particles
 	life = 3;
-	lifeVar = 0.25;
+	lifeVar = 0.25f;
 	
 	// speed of particles
 	speed = 60;
@@ -148,10 +148,10 @@
 	startColor.g = 0.25f;
 	startColor.b = 0.12f;
 	startColor.a = 1.0f;
-	startColorVar.r = 0.0;
-	startColorVar.g = 0.0;
-	startColorVar.b = 0.0;
-	startColorVar.a = 0.0;
+	startColorVar.r = 0.0f;
+	startColorVar.g = 0.0f;
+	startColorVar.b = 0.0f;
+	startColorVar.a = 0.0f;
 	endColor.r = 0.0f;
 	endColor.g = 0.0f;
 	endColor.b = 0.0f;
@@ -161,8 +161,7 @@
 	endColorVar.b = 0.0f;
 	endColorVar.a = 0.0f;
 	
-	texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
-	[texture retain];
+	self.texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
 	
 	// additive
 	blendAdditive = YES;
@@ -211,7 +210,7 @@
 	
 	// life of particles
 	life = 1;
-	lifeVar = 0.5;
+	lifeVar = 0.5f;
 	
 	// speed of particles
 	speed = 20;
@@ -229,10 +228,10 @@
 	startColor.g = 0.25f;
 	startColor.b = 0.12f;
 	startColor.a = 1.0f;
-	startColorVar.r = 0.0;
-	startColorVar.g = 0.0;
-	startColorVar.b = 0.0;
-	startColorVar.a = 0.0;
+	startColorVar.r = 0.0f;
+	startColorVar.g = 0.0f;
+	startColorVar.b = 0.0f;
+	startColorVar.a = 0.0f;
 	endColor.r = 0.0f;
 	endColor.g = 0.0f;
 	endColor.b = 0.0f;
@@ -242,8 +241,7 @@
 	endColorVar.b = 0.0f;
 	endColorVar.a = 0.0f;
 	
-	texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
-	[texture retain];
+	self.texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
 	
 	return self;
 }
@@ -308,10 +306,10 @@
 	startColor.g = 0.25f;
 	startColor.b = 0.76f;
 	startColor.a = 1.0f;
-	startColorVar.r = 0.0;
-	startColorVar.g = 0.0;
-	startColorVar.b = 0.0;
-	startColorVar.a = 0.0;
+	startColorVar.r = 0.0f;
+	startColorVar.g = 0.0f;
+	startColorVar.b = 0.0f;
+	startColorVar.a = 0.0f;
 	endColor.r = 0.0f;
 	endColor.g = 0.0f;
 	endColor.b = 0.0f;
@@ -321,8 +319,7 @@
 	endColorVar.b = 0.0f;
 	endColorVar.a = 0.0f;
 	
-	texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
-	[texture retain];
+	self.texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
 
 	// additive
 	blendAdditive = YES;
@@ -403,8 +400,7 @@
 	endColorVar.b = 0.0f;
 	endColorVar.a = 0.0f;
 	
-	texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
-	[texture retain];
+	self.texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
 
 	// additive
 	blendAdditive = YES;
@@ -485,8 +481,7 @@
 	endColorVar.b = 0.0f;
 	endColorVar.a = 0.0f;
 	
-	texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
-	[texture retain];
+	self.texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
 	
 	// additive
 	blendAdditive = YES;
@@ -535,8 +530,8 @@
 	// emitter position
 	position.x = 160;
 	position.y = 240;
-	posVar.x = 00;
-	posVar.y = 00;
+	posVar.x = 0;
+	posVar.y = 0;
 	
 	// life of particles
 	life = 12;
@@ -567,8 +562,7 @@
 	endColorVar.b = 0.5f;
 	endColorVar.a = 0.0f;
 	
-	texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
-	[texture retain];
+	self.texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
 
 	// additive
 	blendAdditive = NO;
@@ -592,7 +586,7 @@
 		return nil;
 	
 	// duration
-	duration = 0.1;
+	duration = 0.1f;
 	
 	// gravity
 	gravity.x = 0;
@@ -617,11 +611,11 @@
 	// emitter position
 	position.x = 160;
 	position.y = 240;
-	posVar.x = 00;
-	posVar.y = 00;
+	posVar.x = 0;
+	posVar.y = 0;
 	
 	// life of particles
-	life = 5.0;
+	life = 5.0f;
 	lifeVar = 2;
 	
 	// size, in pixels
@@ -649,8 +643,7 @@
 	endColorVar.b = 0.5f;
 	endColorVar.a = 0.0f;
 	
-	texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
-	[texture retain];
+	self.texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
 
 	// additive
 	blendAdditive = NO;
@@ -714,10 +707,10 @@
 	startColor.g = 0.8f;
 	startColor.b = 0.8f;
 	startColor.a = 1.0f;
-	startColorVar.r = 0.02;
-	startColorVar.g = 0.02;
-	startColorVar.b = 0.02;
-	startColorVar.a = 0.0;
+	startColorVar.r = 0.02f;
+	startColorVar.g = 0.02f;
+	startColorVar.b = 0.02f;
+	startColorVar.a = 0.0f;
 	endColor.r = 0.0f;
 	endColor.g = 0.0f;
 	endColor.b = 0.0f;
@@ -727,8 +720,7 @@
 	endColorVar.b = 0.0f;
 	endColorVar.a = 0.0f;
 	
-	texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
-	[texture retain];
+	self.texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
 	
 	// additive
 	blendAdditive = NO;
@@ -756,11 +748,11 @@
 	gravity.y = -1;
 	
 	// angle
-	angle = 90;
+	angle = -90;
 	angleVar = 5;
 	
 	// speed of particles
-	speed = 1;
+	speed = 5;
 	speedVar = 1;
 	
 	// radial
@@ -772,18 +764,18 @@
 	tangentialAccelVar = 1;
 	
 	// emitter position
-	position.x = 160;
-	position.y = 490;
-	posVar.x = 160;
-	posVar.y = 00;
+	position.x = [[Director sharedDirector] winSize].width / 2;
+	position.y = [[Director sharedDirector] winSize].height + 10;
+	posVar.x = [[Director sharedDirector] winSize].width / 2;
+	posVar.y = 0;
 	
 	// life of particles
 	life = 45;
 	lifeVar = 15;
 	
 	// size, in pixels
-	size = 15.0f;
-	sizeVar = 10.0f;
+	size = 10.0f;
+	sizeVar = 5.0f;
 	
 	// emits per second
 	emissionRate = 10;
@@ -806,8 +798,85 @@
 	endColorVar.b = 0.0f;
 	endColorVar.a = 0.0f;
 	
-	texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
-	[texture retain];
+	self.texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
+	
+	// additive
+	blendAdditive = NO;
+	
+	return self;
+}
+@end
+
+@implementation ParticleRain
+-(id) init
+{
+	return [self initWithTotalParticles:1000];
+}
+
+-(id) initWithTotalParticles:(int)p
+{
+	if( !(self=[super initWithTotalParticles:p]) )
+		return nil;
+	
+	// duration
+	duration = -1;
+	
+	// gravity
+	gravity.x = 10;
+	gravity.y = -10;
+	
+	// angle
+	angle = -90;
+	angleVar = 5;
+	
+	// speed of particles
+	speed = 130;
+	speedVar = 30;
+	
+	// radial
+	radialAccel = 0;
+	radialAccelVar = 1;
+	
+	// tagential
+	tangentialAccel = 0;
+	tangentialAccelVar = 1;
+	
+	// emitter position
+	position.x = [[Director sharedDirector] winSize].width / 2;
+	position.y = [[Director sharedDirector] winSize].height;
+	posVar.x = [[Director sharedDirector] winSize].width / 2;
+	posVar.y = 0;
+	
+	// life of particles
+	life = 4.5f;
+	lifeVar = 0;
+	
+	// size, in pixels
+	size = 4.0f;
+	sizeVar = 2.0f;
+	
+	// emits per second
+	emissionRate = 20;
+	
+	// color of particles
+	startColor.r = 0.7f;
+	startColor.g = 0.8f;
+	startColor.b = 1.0f;
+	startColor.a = 1.0f;
+	startColorVar.r = 0.0f;
+	startColorVar.g = 0.0f;
+	startColorVar.b = 0.0f;
+	startColorVar.a = 0.0f;
+	endColor.r = 0.7f;
+	endColor.g = 0.8f;
+	endColor.b = 1.0f;
+	endColor.a = 0.5f;
+	endColorVar.r = 0.0f;
+	endColorVar.g = 0.0f;
+	endColorVar.b = 0.0f;
+	endColorVar.a = 0.0f;
+	
+	self.texture = [[TextureMgr sharedTextureMgr] addImage: @"fire.png"];
 	
 	// additive
 	blendAdditive = NO;

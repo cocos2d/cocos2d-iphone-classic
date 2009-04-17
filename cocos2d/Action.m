@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -15,6 +15,7 @@
 
 #import "Action.h"
 #import "CocosNode.h"
+#import "ccMacros.h"
 
 #import "IntervalAction.h"
 
@@ -24,6 +25,7 @@
 @implementation Action
 
 @synthesize target;
+@synthesize tag;
 
 +(id) action
 {
@@ -36,27 +38,23 @@
 		return nil;
 	
 	target = nil;
+	tag = kActionTagInvalid;
 	return self;
 }
 
 -(void) dealloc
 {
-#if DEBUG
-	NSLog(@"deallocing %@", self);
-#endif
-	if( target ) {
-		[target release];
-		target = nil;
-	}
+	CCLOG(@"deallocing %@", self);
+	[target release];
 	[super dealloc];
 }
 
 -(id) copyWithZone: (NSZone*) zone
 {
 	Action *copy = [[[self class] allocWithZone: zone] init];
-					 	
-    [copy setTarget:[self target]];
-    return copy;
+	copy.target = target;
+	copy.tag = tag;
+	return copy;
 }
 
 -(void) start
@@ -141,6 +139,62 @@
 	return [RepeatForever actionWithAction:[other reverse]];
 }
 
+@end
+
+//
+// Speed
+//
+@implementation Speed
+@synthesize speed;
+
++(id) actionWithAction: (IntervalAction*) action speed:(float)r
+{
+	return [[[self alloc] initWithAction: action speed:r] autorelease];
+}
+
+-(id) initWithAction: (IntervalAction*) action speed:(float)r
+{
+	if( !(self=[super init]) )
+		return nil;
+	
+	other = [action retain];
+	speed = r;
+	return self;
+}
+
+-(id) copyWithZone: (NSZone*) zone
+{
+	Action *copy = [[[self class] allocWithZone: zone] initWithAction:[[other copy] autorelease] speed:speed];
+    return copy;
+}
+
+-(void) dealloc
+{
+	[other release];
+	[super dealloc];
+}
+
+-(void) start
+{
+	[super start];
+	other.target = target;
+	[other start];
+}
+
+-(void) step:(ccTime) dt
+{
+	[other step: dt * speed];
+}
+
+-(BOOL) isDone
+{
+	return [other isDone];
+}
+
+- (IntervalAction *) reverse
+{
+	return [Speed actionWithAction:[other reverse] speed:speed];
+}
 @end
 
 

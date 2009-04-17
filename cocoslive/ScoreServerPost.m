@@ -13,6 +13,7 @@
  */
 
 #import "ScoreServerPost.h"
+#import "ccMacros.h"
 
 // free function used to sort
 NSInteger alphabeticSort(id string1, id string2, void *reverse)
@@ -29,9 +30,15 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 -(NSString*) getHashForData;
 -(NSData*) getBodyValues;
 -(NSString*) encodeData:(NSString*)data;
+-(NSMutableURLRequest *) scoreServerRequestWithURLString:(NSString *)url;
+-(BOOL) submitScore:(NSDictionary*)dict forUpdate:(BOOL)isUpdate;
 @end
 
+
 @implementation ScoreServerPost
+
+@synthesize postStatus;
+
 +(id) serverWithGameName:(NSString*) name gameKey:(NSString*) key delegate:(id) delegate
 {
 	return [[[self alloc] initWithGameName:name gameKey:key delegate:delegate] autorelease];
@@ -53,9 +60,7 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 
 -(void) dealloc
 {
-#if DEBUG
-	NSLog( @"deallocing %@", self);
-#endif
+	CCLOG( @"deallocing %@", self);
 	[delegate release];
 	[gameKey release];
 	[gameName release];
@@ -66,7 +71,21 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 
 
 #pragma mark ScoreServer send scores
--(BOOL) sendScore: (NSDictionary*) dict
+-(BOOL) sendScore: (NSDictionary*) dict 
+{
+    return [self submitScore:dict forUpdate:NO];
+}
+
+-(BOOL) updateScore: (NSDictionary*) dict
+{	
+    if (![dict objectForKey:@"cc_playername"]) {
+		// fail. cc_playername + cc_device_id are needed to update an score
+		[NSException raise:@"cocosLive:updateScore" format:@"cc_playername not found"]; 
+	}
+    return [self submitScore:dict forUpdate:YES];
+}
+
+-(BOOL) submitScore: (NSDictionary*)dict forUpdate:(BOOL)isUpdate
 {	
     [receivedData setLength:0];
 	
@@ -74,31 +93,25 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 	postStatus = kPostStatusOK;
 		
 	// create the request
-	NSMutableURLRequest *post=[NSMutableURLRequest requestWithURL:[NSURL URLWithString: SCORE_SERVER_SEND_URL]
-													cachePolicy:NSURLRequestUseProtocolCachePolicy
-													timeoutInterval:10.0];
-	
-	[post setHTTPMethod: @"POST"];
-	[post setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+	NSMutableURLRequest *post = [self scoreServerRequestWithURLString:(isUpdate ? SCORE_SERVER_UPDATE_URL : SCORE_SERVER_SEND_URL)];
 	
 	CC_MD5_Init( &md5Ctx);
 
-	// hash SHALL be calculated in certain order
+    // hash SHALL be calculated in certain order
 	NSArray *keys = [dict allKeys];
 	int reverseSort = NO;
 	NSArray *sortedKeys = [keys sortedArrayUsingFunction:alphabeticSort context:&reverseSort];
 	for( id key in sortedKeys )
-		[self calculateHashAndAddValue:[dict objectForKey:key] key:key];
+		[self calculateHashAndAddValue:[dict objectForKey:key] key:key];    
 
-	// device id is hashed to prevent spoofing this same score from different devices
+    // device id is hashed to prevent spoofing this same score from different devices
 	// one way to prevent a replay attack is to send cc_id & cc_time and use it as primary keys
-
-	
+    
 	[self addValue:[[UIDevice currentDevice] uniqueIdentifier] key:@"cc_device_id"];
 	[self addValue:gameName key:@"cc_gamename"];
 	[self addValue:[self getHashForData] key:@"cc_hash"];
 	[self addValue:SCORE_SERVER_PROTOCOL_VERSION key:@"cc_prot_ver"];
-
+    
 	[post setHTTPBody: [self getBodyValues] ];
 	
 	// create the connection with the request
@@ -108,7 +121,20 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 	if ( ! theConnection)
 		return NO;
 	
+	// XXX: Don't release 'theConnection' here
+	// XXX: It will be released by the delegate
+
 	return YES;
+}
+
+-(NSMutableURLRequest *) scoreServerRequestWithURLString:(NSString *)url {
+    NSMutableURLRequest *request=[NSMutableURLRequest requestWithURL:[NSURL URLWithString: url]
+                                                      cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                  timeoutInterval:10.0];
+	
+	[request setHTTPMethod: @"POST"];
+	[request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    return request;
 }
 
 -(void) calculateHashAndAddValue:(id) value key:(NSString*) key
@@ -205,25 +231,22 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
     // receivedData is declared as a method instance elsewhere
 	[receivedData appendData:data];
 	
-#if DEBUG
 //	NSString *dataString = [NSString stringWithCString:[data bytes] length: [data length]];
-//	NSLog( @"data: %@", dataString);
-#endif
+//	CCLOG( @"data: %@", dataString);
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-#if DEBUG
-	NSLog(@"Connection failed");
-#endif
+	CCLOG(@"Connection failed");
+
 	// wifi problems ?
 	postStatus = kPostStatusConnectionFailed;
 
     // release the connection, and the data object
     [connection release];
 	
-	if( [delegate respondsToSelector:@selector(scoreRequestFail:) ] )
-		[delegate scoreRequestFail:self];
+	if( [delegate respondsToSelector:@selector(scorePostFail:) ] )
+		[delegate scorePostFail:self];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -236,17 +259,17 @@ NSInteger alphabeticSort(id string1, id string2, void *reverse)
 		// Ok
 		postStatus = kPostStatusOK;
 
-		if( [delegate respondsToSelector:@selector(scoreRequestOk:) ] )
-			[delegate scoreRequestOk:self];
+		if( [delegate respondsToSelector:@selector(scorePostOk:) ] )
+			[delegate scorePostOk:self];
 	} else {
-#if DEBUG
-		NSLog(@"Post Score failed. Reason: %@", dataString);
-#endif
+		
+		CCLOG(@"Post Score failed. Reason: %@", dataString);
+
 		// Error parsing answer
 		postStatus = kPostStatusPostFailed;
 
-		if( [delegate respondsToSelector:@selector(scoreRequestFail:) ] )
-			[delegate scoreRequestFail:self];
+		if( [delegate respondsToSelector:@selector(scorePostFail:) ] )
+			[delegate scorePostFail:self];
 	}
 }
 

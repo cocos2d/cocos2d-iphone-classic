@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -17,7 +17,12 @@
 #import "MenuItem.h"
 #import "Layer.h"
 
-/** A Menu */
+/** A Menu
+ * 
+ * Features and Limitation:
+ *  - You can add MenuItem objects in runtime using addChild:
+ *  - But the only accecpted children are MenuItem objects
+ */
 @interface Menu : Layer <CocosNodeOpacity>
 {
 	int selectedItem;
@@ -32,15 +37,27 @@
 
 /** align items vertically */
 -(void) alignItemsVertically;
-
-/** align items vertically using the v0.5 algorithm
- * @deprecated This method will be removed in v0.7
+/** align items vertically with padding
+ @since v0.7.2
  */
--(void) alignItemsVerticallyOld;
-
+-(void) alignItemsVerticallyWithPadding:(float) padding;
 
 /** align items horizontally */
 -(void) alignItemsHorizontally;
+/** align items horizontally with padding
+ @since v0.7.2
+ */
+-(void) alignItemsHorizontallyWithPadding: (float) padding;
+
+
+/** align items in rows of columns */
+-(void) alignItemsInColumns: (NSNumber *) columns, ... NS_REQUIRES_NIL_TERMINATION;
+-(void) alignItemsInColumns: (NSNumber *) columns vaList: (va_list) args;
+
+/** align items in columns of rows */
+-(void) alignItemsInRows: (NSNumber *) rows, ... NS_REQUIRES_NIL_TERMINATION;
+-(void) alignItemsInRows: (NSNumber *) rows vaList: (va_list) args;
+
 
 @property (readwrite,assign) GLubyte opacity;
 

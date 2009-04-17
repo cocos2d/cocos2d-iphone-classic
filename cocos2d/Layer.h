@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -24,7 +24,7 @@
  * return YES if the event was handled
  * return NO if the event was not handled
  */
-@protocol TouchEventsDelegate
+@protocol TouchEventsDelegate <NSObject>
 @optional
 - (BOOL)ccTouchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;
 - (BOOL)ccTouchesMoved:(NSSet *)touches withEvent:(UIEvent *)event;
@@ -36,7 +36,12 @@
 //
 // Layer
 //
-/** a Layer */
+/** Layer is a subclass of CocosNode that implements the TouchEventsDelegate protocol.
+ 
+ All features from CocosNode are valid, plus the following new features:
+ - It can receive iPhone Touches
+ - It can receive Accelerometer input
+*/
 @interface Layer : CocosNode <UIAccelerometerDelegate, TouchEventsDelegate>
 {
 	//! whether or not it will receive Touch events
@@ -54,10 +59,16 @@
 //
 // ColorLayer
 //
-/** a Layer with color and opacity */
-@interface ColorLayer : Layer <CocosNodeOpacity>
+/** ColorLayer is a subclass of Layer that implements the CocosNodeSize, CocosNodeOpacity and CocosNodeRGB protocol.
+ 
+ All features from Layer are valid, plus the following new features:
+ - opacity
+ - RGB colors
+ - contentSize
+ */
+@interface ColorLayer : Layer <CocosNodeOpacity, CocosNodeRGB, CocosNodeSize>
 {
-	GLuint color;
+	GLubyte r,g,b,opacity;
 	GLfloat squareVertices[4 * 2];
 	GLubyte squareColors[4 * 4];
 }
@@ -75,29 +86,25 @@
 /** initializes the witdh and height of the layer */
 - (void) initWidth: (GLfloat)w height:(GLfloat)h;
 
-/** changes the color of the layer */
-- (void) changeColor: (GLuint) aColor;
+/** changes the color of the layer
+ @deprecated Use CocosNodeRGB protocol instead
+ */
+- (void) changeColor: (GLuint) aColor __attribute__ ((deprecated));
 
 /** change width */
 -(void) changeWidth: (GLfloat)w;
 /** change height */
 -(void) changeHeight: (GLfloat)h;
 
-// CocosNodeOpacity protocol
-/** returns the opacity
- @return 
- */
--(GLubyte) opacity;
-/** sets the opacity of the layer */
--(void) setOpacity: (GLubyte) opacity;
+/* deprecated */
+@property (readonly) GLuint color __attribute__ ((deprecated));
 
-@property (readwrite, assign) GLuint color;
+/** conforms to CocosNodeRGB and CocosNodeOpacity protocol */
+@property (readonly) GLubyte r,g,b,opacity;
 
 @end
 
-//
-// MultiplexLayer
-//
+/** A Layer with the ability to multiplex it's children */
 @interface MultiplexLayer : Layer
 {
 	unsigned int enabledLayer;

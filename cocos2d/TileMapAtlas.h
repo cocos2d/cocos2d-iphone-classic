@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -14,13 +14,25 @@
 
 #import "TextureAtlas.h"
 #import "AtlasNode.h"
-#import "TGAlib.h"
+#import "Support/TGAlib.h"
 
-/** A TileMap that laods the font from a Texture Atlas */
+/** TileMapAtlas is a subclass of AtlasNode.
+ 
+ It knows how to render a map based of tiles.
+ The tiles must be in a .PNG format while the map must be a .TGA file.
+ 
+ For more information regarding the format, please see this post:
+ http://blog.sapusmedia.com/2008/12/how-to-use-tilemap-editor-for-cocos2d.html
+ 
+ All features from AtlasNode are valid in TileMapAtlas
+ */
 @interface TileMapAtlas : AtlasNode {
 	
 	/// info about the map file
 	tImageTGA		*tgaInfo;
+	
+	/// x,y to altas dicctionary
+	NSMutableDictionary	*posToAtlasIndex;
 	
 	/// size of the map in pixels
 	CGSize			contentSize;
@@ -29,7 +41,11 @@
 	int				itemsToRender;
 }
 
+/** content size of the TileMap */
 @property (readonly) CGSize contentSize;
+
+/** TileMap info */
+@property (readonly) tImageTGA *tgaInfo;
 
 /** creates the TileMap with a tile file (atlas) with a map file and the width and height of each tile */
 +(id) tileMapAtlasWithTileFile:(NSString*)tile mapFile:(NSString*)map tileWidth:(int)w tileHeight:(int)h;
@@ -37,4 +53,15 @@
 /** initializes the TileMap with a tile file (atlas) with a map file and the width and height of each tile */
 -(id) initWithTileFile:(NSString*)tile mapFile:(NSString*)map tileWidth:(int)w tileHeight:(int)h;
 
+/** returns a tile from position x,y.
+ For the moment only channel R is used
+ */
+-(ccRGBB) tileAt: (ccGridSize) position;
+
+/** sets a tile at position x,y.
+ For the moment only channel R is used
+ */
+-(void) setTile:(ccRGBB)tile at:(ccGridSize)position;
+/** dealloc the map from memory */
+-(void) releaseMap;
 @end

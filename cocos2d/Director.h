@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -13,14 +13,13 @@
  */
 
 
-// cocoa related
-#import <UIKit/UIKit.h>
-
 // OpenGL related
 #import "Support/EAGLView.h"
 
 // cocos2d related
 #import "Scene.h"
+
+@protocol TouchEventsDelegate;
 
 enum {
 	kEventHandled = YES,
@@ -34,24 +33,35 @@ enum {
 // uncomment this line to use the old method that updated
 #define FAST_FPS_DISPLAY 1
 
-enum {
-	RGB565,
-	RGBA8
-};
+/** Possible Pixel Formats for the EAGLView */
+typedef enum {
+	kRGB565,
+	kRGBA8
+} tPixelFormat;
+
+/** Possible DepthBuffer Formats for the EAGLView */
+typedef enum {
+   kDepthBufferNone,
+   kDepthBuffer16,
+   kDepthBuffer24,
+} tDepthBufferFormat;
 
 @class LabelAtlas;
 
 /**Class that creates and handle the main Window and manages how
 and when to execute the Scenes
 */
-@interface Director : EAGLView
+@interface Director : NSObject <EAGLTouchDelegate>
 {
-	UIWindow*	window;
-	CGRect		winSize;
+	EAGLView	*openGLView_;
 
+	// internal timer
 	NSTimer *animationTimer;
 	NSTimeInterval animationInterval;
 	NSTimeInterval oldAnimationInterval;
+
+	tPixelFormat pixelFormat_;
+	tDepthBufferFormat depthBufferFormat_;
 
 	/* landscape mode ? */
 	BOOL landscape;
@@ -68,57 +78,87 @@ and when to execute the Scenes
 	/* is the running scene paused */
 	BOOL paused;
 	
-	/* running scene */
-	Scene *runningScene;
+	/* The running scene */
+	Scene *runningScene_;
 	
-	/* will be the next 'runningScene' in the next frame */
+	/* will be the next 'runningScene' in the next frame
+	 nextScene is a weak reference. */
 	Scene *nextScene;
 	
 	/* event handler */
 	NSMutableArray	*eventHandlers;
 
 	/* scheduled scenes */
-	NSMutableArray *scenes;
+	NSMutableArray *scenesStack_;
 	
 	/* last time the main loop was updated */
 	struct timeval lastUpdate;
 	/* delta time since last tick to main loop */
 	ccTime dt;
 	/* whether or not the next delta time will be zero */
-	 BOOL nextDeltaTimeZero;
+	BOOL nextDeltaTimeZero_;
 	
 	/* are touch events enabled. Default is YES */
 	BOOL eventsEnabled;
 }
 
 /** The current running Scene. Director can only run one Scene at the time */
-@property (readonly, assign) Scene* runningScene;
+@property (readonly) Scene* runningScene;
 /** The FPS value */
 @property (readwrite, assign) NSTimeInterval animationInterval;
-/** The UIKit window. Use it to embed UIKit object within cocos2d */
-@property (readwrite,assign) UIWindow* window;
 /** Whether or not to display the FPS on the bottom-left corner */
 @property (readwrite, assign) BOOL displayFPS;
 /** Whether or not to propagate the touch events to the running Scene. Default YES */
 @property (readwrite, assign) BOOL eventsEnabled;
+/** The OpenGL view */
+@property (readonly) EAGLView *openGLView;
+/** Pixel format used to create the context */
+@property (readonly) tPixelFormat pixelFormat;
+/** whether or not the next delta time will be zero */
+@property (readwrite,assign) BOOL nextDeltaTimeZero;
 
 /** returns a shared instance of the director */
 +(Director *)sharedDirector;
+/** Uses a Director that triggers the main loop as fast as it can.
+ * Although it is faster, it will consume more battery
+ * To use it, it must be called before calling any director function
+ */
++(void) useFastDirector;
+ 
 
 // iPhone Specific
 
-/** change default pixel format
- Call this class method before any other call to the Director.
- Default pixel format: RGB565. Supported pixel formats: RGBA8 and RGB565
+/** change default pixel format.
+ Call this class method before attaching it to a UIWindow/UIView
+ Default pixel format: kRGB565. Supported pixel formats: kRGBA8 and kRGB565
  */
-+(void) setPixelFormat: (int) p;
+-(void) setPixelFormat: (tPixelFormat) p;
+
+/** change depth buffer format.
+ Call this class method before attaching it to a UIWindow/UIView
+ Default depth buffer: 0 (none).  Supported: kDepthBufferNone, kDepthBuffer16, and kDepthBuffer24
+ */
+-(void) setDepthBufferFormat: (tDepthBufferFormat) db;
+
+// Integration with UIKit
+/** detach the cocos2d view from the view/window */
+-(BOOL)detach;
+
+/** attach in UIWindow using the full frame */
+-(BOOL)attachInWindow:(UIWindow *)window;
+
+/** attach in UIView using the full frame */
+-(BOOL)attachInView:(UIView *)view;
+
+/** attach in UIView using the given frame */
+-(BOOL)attachInView:(UIView *)view withFrame:(CGRect)frame;
 
 // Landscape
 
-/** returns the size of the screen 480x320 or 320x480 depeding if landscape mode is activated or not */
-- (CGRect) winSize;
-/** returns 320x480, always */
--(CGRect) displaySize;
+/** returns the size of the OpenGL view according to the landspace */
+- (CGSize) winSize;
+/** returns the display size of the OpenGL view */
+-(CGSize) displaySize;
 
 /** returns whether or not the screen is in landscape mode */
 - (BOOL) landscape;
@@ -131,27 +171,32 @@ and when to execute the Scenes
 
 // Scene Management
 
-/**Runs a scene, entering in the Director's main loop. 
+/**Enters the Director's main loop with the given Scene. 
+ * Call it to run only your FIRST scene.
+ * Don't call it if there is already a running scene.
  */
-- (void) runScene:(Scene*) scene;
+- (void) runWithScene:(Scene*) scene;
 
 /**Suspends the execution of the running scene, pushing it on the stack of suspended scenes.
- The new scene will be executed.
- Try to avoid big stacks of pushed scenes to reduce memory allocation. 
+ * The new scene will be executed.
+ * Try to avoid big stacks of pushed scenes to reduce memory allocation. 
+ * ONLY call it if there is a running scene.
  */
 - (void) pushScene:(Scene*) scene;
 
 /**Pops out a scene from the queue.
- This scene will replace the running one.
- The running scene will be deleted. If there are no more scenes in the stack the execution is terminated.
+ * This scene will replace the running one.
+ * The running scene will be deleted. If there are no more scenes in the stack the execution is terminated.
+ * ONLY call it if there is a running scene.
  */
 - (void) popScene;
 
 /** Replaces the running scene with a new one. The running scene is terminated.
+ * ONLY call it if there is a running scene.
  */
 -(void) replaceScene: (Scene*) scene;
 
-/** Ends the execution */
+/** Ends the execution, releases the running scene */
 -(void) end;
 
 /** Pauses the running scene.
@@ -166,18 +211,24 @@ and when to execute the Scenes
  */
 -(void) resume;
 
-/** Hides the Director Window & stops animation */
--(void) hide;
+/** Stops the animation. Nothing will be drawn. The main loop won't be triggered anymore.
+ If you wan't to pause your animation call [pause] instead.
+ */
+-(void) stopAnimation;
 
-/** UnHides the Director Window & starts animation*/
--(void) unhide;
+/** The main loop is triggered again.
+ Call this function only if [stopAnimation] was called earlier
+ @warning Dont' call this function to start the main loop. To run the main loop call runWithScene
+ */
+-(void) startAnimation;
+
 
 // Events
 
-/** adds a cocosnode object to the list of multi-touch event queue */
--(void) addEventHandler: (CocosNode*) node;
-/** removes a cocosnode object from the list of multi-touch event queue */
--(void) removeEventHandler: (CocosNode*) node;
+/** adds a delegate to the list of multi-touch handlers */
+-(void) addEventHandler: (id<TouchEventsDelegate>) delegate;
+/** removes a delegate from the list of multi-touch handlers */
+-(void) removeEventHandler: (id<TouchEventsDelegate>) delegate;
 
 // OpenGL Helper
 
@@ -193,6 +244,18 @@ and when to execute the Scenes
 -(void) set2Dprojection;
 /** sets a 3D projection */
 -(void) set3Dprojection;
+@end
+
+/** FastDirector is a Director that triggers the main loop as fast as possible.
+ * In some circumstances it is faster than the normal Director.
+ @warning BUG: Don't use the FastDirector if you are going the detach and then re-attach the opengl view again.
+ */
+@interface FastDirector : Director
+{
+	BOOL isRunning;
+	
+	NSAutoreleasePool	*autoreleasePool;
+}
 @end
 
 

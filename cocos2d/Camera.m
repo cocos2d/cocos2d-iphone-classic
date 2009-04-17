@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -15,10 +15,14 @@
 
 #import "Director.h"
 #import "Camera.h"
+#import "ccMacros.h"
 
-#import "glu.h"
+#import "Support/glu.h"
 
 @implementation Camera
+
+@synthesize dirty;
+
 -(id) init
 {
 	if( !(self=[super init]) )
@@ -28,16 +32,28 @@
 	return self;
 }
 
+- (NSString*) description
+{
+	return [NSString stringWithFormat:@"<%@ = %08X | center = (%.2f,%.2f,%.2f)>", [self class], self, centerX, centerY, centerZ];
+}
+
+
+- (void) dealloc
+{
+	CCLOG(@"deallocing %@", self);
+	[super dealloc];
+}
+
 -(void) restore
 {
-	CGRect s = [[Director sharedDirector] displaySize];
+	CGSize s = [[Director sharedDirector] displaySize];
 
-	eyeX = s.size.width/2;
-	eyeY = s.size.height/2;
+	eyeX = s.width/2;
+	eyeY = s.height/2;
 	eyeZ = [Camera getZEye];
 	
-	centerX = s.size.width/2;
-	centerY = s.size.height/2;
+	centerX = s.width/2;
+	centerY = s.height/2;
 	centerZ = 0.0f;
 	
 	upX = 0.0f;
@@ -63,7 +79,7 @@
 				);
 		
 		if( landscape )
-#if LANDSCAPE_LEFT
+#ifdef LANDSCAPE_LEFT
 			glTranslatef(-80,80,0);
 #else
 #error "FIX ME"
@@ -73,8 +89,8 @@
 
 +(float) getZEye
 {
-	CGRect s = [[Director sharedDirector] displaySize];
-	return ( s.size.height / 1.1566 );
+	CGSize s = [[Director sharedDirector] displaySize];
+	return ( s.height / 1.1566f );
 }
 
 -(void) setEyeX: (float)x eyeY:(float)y eyeZ:(float)z

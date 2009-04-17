@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -27,8 +27,8 @@
  */
 
 // 0x00 HI ME LO
-// 00   00 06 00
-#define COCOS2D_VERSION 0x00000601
+// 00   00 07 02
+#define COCOS2D_VERSION 0x00000702
 
 //
 // all cocos2d include files
@@ -40,6 +40,7 @@
 #import "Director.h"
 #import "InstantAction.h"
 #import "IntervalAction.h"
+#import "EaseAction.h"
 #import "Label.h"
 #import "Layer.h"
 #import "Menu.h"
@@ -53,11 +54,24 @@
 #import "TextureMgr.h"
 #import "TextureNode.h"
 #import "Transition.h"
-#import "types.h"
 #import "TextureAtlas.h"
 #import "LabelAtlas.h"
 #import "TileMapAtlas.h"
 #import "AtlasNode.h"
+#import "EaseAction.h"
+#import "TiledGridAction.h"
+#import "Grabber.h"
+#import "Grid.h"
+#import "Grid3DAction.h"
+#import "GridAction.h"
+#import "AtlasSprite.h"
+#import "AtlasSpriteManager.h"
+
+//
+// cocos2d macros
+//
+#import "ccTypes.h"
+#import "ccMacros.h"
 
 //
 // cocos2d helper files
@@ -65,6 +79,8 @@
 #import "Support/OpenGL_Internal.h"
 #import "Support/Texture2D.h"
 #import "Support/EAGLView.h"
+#import "Support/FileUtils.h"
+#import "Support/CGPointExtension.h"
 
 
 // free functions

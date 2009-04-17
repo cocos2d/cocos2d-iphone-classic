@@ -65,6 +65,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 //CONSTANTS:
 
+/** Possible texture pixel formats */
 typedef enum {
 	kTexture2DPixelFormat_Automatic = 0,
 	kTexture2DPixelFormat_RGBA8888,
@@ -91,49 +92,114 @@ typedef enum {
 	GLfloat						_maxS,
 								_maxT;
 }
+/** Intializes with a texture2d with data */
 - (id) initWithData:(const void*)data pixelFormat:(Texture2DPixelFormat)pixelFormat pixelsWide:(NSUInteger)width pixelsHigh:(NSUInteger)height contentSize:(CGSize)size;
 
+/** pixelFormat */
 @property(readonly) Texture2DPixelFormat pixelFormat;
+/** width in pixels */
 @property(readonly) NSUInteger pixelsWide;
+/** hight in pixels */
 @property(readonly) NSUInteger pixelsHigh;
 
+/** texture name */
 @property(readonly) GLuint name;
 
+/** content size */
 @property(readonly, nonatomic) CGSize contentSize;
+/** texture max S */
 @property(readonly) GLfloat maxS;
+/** texture max T */
 @property(readonly) GLfloat maxT;
 @end
 
-/*
+/**
 Drawing extensions to make it easy to draw basic quads using a Texture2D object.
 These functions require GL_TEXTURE_2D and both GL_VERTEX_ARRAY and GL_TEXTURE_COORD_ARRAY client states to be enabled.
 */
 @interface Texture2D (Drawing)
+/** draws a texture at a given point */
 - (void) drawAtPoint:(CGPoint)point;
+/** draws a texture inside a rect */
 - (void) drawInRect:(CGRect)rect;
 @end
 
-/*
+/**
 Extensions to make it easy to create a Texture2D object from an image file.
 Note that RGBA type textures will have their alpha premultiplied - use the blending mode (GL_ONE, GL_ONE_MINUS_SRC_ALPHA).
 */
 @interface Texture2D (Image)
+/** Initializes a texture from a UIImage object */
 - (id) initWithImage:(UIImage *)uiImage;
 @end
 
-/*
+/**
 Extensions to make it easy to create a Texture2D object from a string of text.
 Note that the generated textures are of type A8 - use the blending mode (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA).
 */
 @interface Texture2D (Text)
+/** Initializes a texture from a string with dimensions, alignment, font name and font size */
 - (id) initWithString:(NSString*)string dimensions:(CGSize)dimensions alignment:(UITextAlignment)alignment fontName:(NSString*)name fontSize:(CGFloat)size;
+/** Initializes a texture from a string with font name and font size */
+- (id) initWithString:(NSString*)string fontName:(NSString*)name fontSize:(CGFloat)size;
 @end
 
-/*
+/**
  Extensions to make it easy to create a Texture2D object from a PVRTC file
  */
 @interface Texture2D (PVRTC)
+/** Initializes a texture from a PVRTC buffer */
 -(id) initWithPVRTCData: (const void*)data level:(int)level bpp:(int)bpp hasAlpha:(BOOL)hasAlpha length:(int)length;
+/** Initializes a texture from a PVRTC file */
+-(id) initWithPVRTCFile: (NSString*) file;
+@end
+
+/**
+ Extension to set the Min / Mag filter
+ */
+typedef struct _ccTexParams {
+	GLuint	minFilter;
+	GLuint	magFilter;
+	GLuint	wrapS;
+	GLuint	wrapT;
+} ccTexParams;
+
+@interface Texture2D (GLFilter)
+/** sets the min filter, mag filter, wrap s and wrap t texture parameters
+ @warning this function is not thread safe
+ */
++(void) setTexParameters: (ccTexParams*) texParams;
+
+/** returns the min filter, mag filter, wrap s and wrap t texture parameters
+ @warning this function is not thread safe
+ */
++(ccTexParams) texParameters;
+
+/** apply the setted min/mag filter to the current texture
+ @warning this function is not thread safe
+ */
++ (void) applyTexParameters;
+
+/** saves in an internal variable the current tex parameters
+ @warning this function is not thread safe and it is not re-entrat
+ */
++ (void) saveTexParameters;
+
+/** restores from the internal variable the tex parameters
+ @warning this function is not thread safe and it is not re-entrat
+ */
++ (void) restoreTexParameters;
+
+/** sets antialias texture parameters
+ @warning this function is not thread safe and it is not re-entrat
+ */
++ (void) setAntiAliasTexParameters;
+
+/** sets alias texture parameters
+ @warning this function is not thread safe and it is not re-entrat
+ */
++ (void) setAliasTexParameters;
+
 @end
 
 

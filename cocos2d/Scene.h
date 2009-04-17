@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -17,9 +17,16 @@
 
 #import "CocosNode.h"
 
-/** Control the dispatching of events to its layers
- */
+/** Scene is a subclass of CocosNode that is used only as an abstract concept.
+ 
+ Scene an CocosNode are almost identical with the difference that Scene has it's
+ anchor point (by default) at the center of the screen.
 
+ For the moment Scene has no other logic than that, but in future releases it might have
+ additional logic.
+
+ It is a good practice to use and Scene as the parent of all your nodes.
+*/
 @interface Scene : CocosNode {
 
 }

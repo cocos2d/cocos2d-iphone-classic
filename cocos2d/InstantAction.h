@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -54,12 +54,12 @@
  */
 @interface Place : InstantAction <NSCopying>
 {
-	cpVect position;
+	CGPoint position;
 }
 /** creates a Place action with a position */
-+(id) actionWithPosition: (cpVect) pos;
++(id) actionWithPosition: (CGPoint) pos;
 /** Initializes a Place action with a position */
--(id) initWithPosition: (cpVect) pos;
+-(id) initWithPosition: (CGPoint) pos;
 @end
 
 /** Calls a 'callback'

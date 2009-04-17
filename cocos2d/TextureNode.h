@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -20,8 +20,18 @@
 #import "CocosNode.h"
 
 
-/** A CocosNode that knows how to render a texture */
-@interface TextureNode : CocosNode <CocosNodeOpacity, CocosNodeSize> {
+/** TextureNode is a subclass of CocosNode that implements the CocosNodeOpacity,
+ * CocosNodeRGB and CocosNodeSize protocol.
+ *
+ * As the name implies it, it knows how to render a textures.
+ *
+ * All features from CocosNode are valid, plus the following new features:
+ *  - opacity
+ *  - contentSize
+ *  - RGB (setRGB:::)
+ *  - texture (can be Aliased or AntiAliased)
+ */
+@interface TextureNode : CocosNode <CocosNodeOpacity, CocosNodeRGB, CocosNodeSize> {
 
 	/// texture
 	Texture2D *texture;
@@ -33,17 +43,9 @@
 	GLubyte	r,g,b;
 }
 
-@property (readwrite,assign) Texture2D *texture;
+/** The texture that is rendered */
+@property (readwrite,retain) Texture2D *texture;
+
+/** conforms to CocosNodeOpacity and CocosNodeRGB protocol */
 @property (readwrite,assign) GLubyte r, g, b, opacity;
-
-/** set the color of the texture.
- * example:  [node setRGB: 255:128:25];
- */
--(void) setRGB: (GLubyte)r :(GLubyte)g :(GLubyte)b;
-
-
-/** returns the size in pixels of the texture
- * Conforms to the CocosNodeSize protocol
- */
--(CGSize) contentSize;
 @end

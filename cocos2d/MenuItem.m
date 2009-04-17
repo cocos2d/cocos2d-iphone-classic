@@ -2,7 +2,7 @@
  *
  * http://code.google.com/p/cocos2d-iphone
  *
- * Copyright (C) 2008 Ricardo Quesada
+ * Copyright (C) 2008,2009 Ricardo Quesada
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the 'cocos2d for iPhone' license.
@@ -14,22 +14,29 @@
 
 #import "MenuItem.h"
 #import "Label.h"
+#import "LabelAtlas.h"
 #import "IntervalAction.h"
 #import "Sprite.h"
+#import "Support/CGPointExtension.h"
 
 static int _fontSize = kItemSize;
 static NSString *_fontName = @"Marker Felt";
 static BOOL _fontNameRelease = NO;
 
 enum {
-	kCurrentItem = 0x01234567,
+	kCurrentItem = 0xc0c05001,
 };
 
+enum {
+	kZoomActionTag = 0xc0c05002,
+};
+
+
+
+#pragma mark -
 #pragma mark MenuItem
 
 @implementation MenuItem
-
-@synthesize opacity;
 
 @synthesize opacity;
 
@@ -106,10 +113,8 @@ enum {
 -(CGRect) rect
 {
 	NSAssert(1,@"MenuItem.rect must be overriden");
-	
-	// to make the compiler happy
-	CGRect a;
-	return a;
+
+	return CGRectNull;
 }
 
 -(CGSize) contentSize
@@ -121,8 +126,131 @@ enum {
 @end
 
 
-#pragma mark MenuItemFont
+#pragma mark  -
+#pragma mark MenuItemAtlasFont
 
+
+@implementation MenuItemAtlasFont
+
+@synthesize label;
+
++(id) itemFromString: (NSString*) value charMapFile:(NSString*) charMapFile itemWidth:(int)itemWidth itemHeight:(int)itemHeight startCharMap:(char)startCharMap
+{
+	return [MenuItemAtlasFont itemFromString:value charMapFile:charMapFile itemWidth:itemWidth itemHeight:itemHeight startCharMap:startCharMap target:nil selector:nil];
+}
+
++(id) itemFromString: (NSString*) value charMapFile:(NSString*) charMapFile itemWidth:(int)itemWidth itemHeight:(int)itemHeight startCharMap:(char)startCharMap target:(id) rec selector:(SEL) cb
+{
+	return [[[self alloc] initFromString:value charMapFile:charMapFile itemWidth:itemWidth itemHeight:itemHeight startCharMap:startCharMap target:rec selector:cb] autorelease];
+}
+
+-(id) initFromString: (NSString*) value charMapFile:(NSString*) charMapFile itemWidth:(int)itemWidth itemHeight:(int)itemHeight startCharMap:(char)startCharMap target:(id) rec selector:(SEL) cb
+{
+	if(!(self=[super initWithTarget:rec selector:cb]) )
+		return nil;
+	
+	if( [value length] == 0 ) {
+		NSException* myException = [NSException
+									exceptionWithName:@"MenuItemInvalid"
+									reason:@"Can't create a MenuItem without value"
+									userInfo:nil];
+		@throw myException;
+	}
+	
+	
+	label = [[LabelAtlas alloc] initWithString:value charMapFile:charMapFile itemWidth:itemWidth itemHeight:itemHeight startCharMap:startCharMap];
+	[label setOpacity:opacity];
+	
+	CGSize s = label.contentSize;
+	transformAnchor = ccp( s.width/2, s.height/2 );
+	
+	return self;
+}
+
+-(void) setString:(NSString *)string
+{
+    [label setString:string];
+	CGSize s = label.contentSize;
+    transformAnchor = ccp( s.width/2, s.height/2 );
+}
+
+-(void) dealloc
+{
+	[label release];
+	[super dealloc];
+}
+
+-(CGRect) rect
+{
+	CGSize s = label.contentSize;
+	
+	CGRect r = CGRectMake( position.x - s.width/2, position.y-s.height/2, s.width, s.height);
+	return r;
+}
+
+-(void) activate {
+	if(isEnabled) {
+		[self stopAllActions];
+        
+		self.scale = 1.0f;
+        
+		[super activate];
+	}
+}
+
+-(void) selected
+{
+	// subclass to change the default action
+	if(isEnabled) {		
+		[self stopActionByTag:kZoomActionTag];
+		Action *zoomAction = [ScaleTo actionWithDuration:0.1f scale:1.2f];
+		zoomAction.tag = kZoomActionTag;
+		[self runAction:zoomAction];
+	}
+}
+
+-(void) unselected
+{
+	// subclass to change the default action
+	if(isEnabled) {
+		[self stopActionByTag:kZoomActionTag];
+		Action *zoomAction = [ScaleTo actionWithDuration:0.1f scale:1.0f];
+		zoomAction.tag = kZoomActionTag;
+		[self runAction:zoomAction];
+	}
+}
+
+-(void) setIsEnabled: (BOOL)enabled
+{
+	if(enabled == NO)
+		[label setRGB:126 :126 :126];
+	else
+		[label setRGB:255 :255 :255];
+    
+	[super setIsEnabled:enabled];
+}
+
+-(CGSize) contentSize
+{
+	return [label contentSize];
+}
+
+-(void) draw
+{
+	[label draw];
+}
+
+- (void) setOpacity: (GLubyte)newOpacity
+{
+    opacity = newOpacity;
+    [label setOpacity:opacity];
+}
+
+@end
+
+
+#pragma mark -
+#pragma mark MenuItemFont
 
 @implementation MenuItemFont
 
@@ -176,21 +304,27 @@ enum {
 	}
 	
 	
-	label = [Label labelWithString:value dimensions:CGSizeMake((_fontSize+2)*[value length], (_fontSize+5)) alignment:UITextAlignmentCenter fontName:_fontName fontSize:_fontSize];
+	label = [Label labelWithString:value fontName:_fontName fontSize:_fontSize];
 
 	[label retain];
 	[label setOpacity:opacity];
 	
 	CGSize s = label.contentSize;
-	transformAnchor = cpv( s.width/2, s.height/2 );
+	transformAnchor = ccp( s.width/2, s.height/2 );
 	
 	return self;
+}
+
+-(void) setString:(NSString *)string
+{
+	[label setString:string];
+	CGSize s = label.contentSize;
+	transformAnchor = ccp( s.width/2, s.height/2 );
 }
 
 -(void) dealloc
 {
 	[label release];
-	[zoomAction release];
 	[super dealloc];
 }
 
@@ -205,11 +339,7 @@ enum {
 -(void) activate {
 	if(isEnabled) {
 		[self stopAllActions];
-		[zoomAction release];
-		zoomAction = nil;
-
-		self.scale = 1.0;
-
+		self.scale = 1.0f;
 		[super activate];
 	}
 }
@@ -218,10 +348,10 @@ enum {
 {
 	// subclass to change the default action
 	if(isEnabled) {
-		[self stopAction: zoomAction];
-		[zoomAction release];
-		zoomAction = [[ScaleTo actionWithDuration:0.1 scale:1.2] retain];
-		[self do:zoomAction];
+		[self stopActionByTag:kZoomActionTag];
+		Action *zoomAction = [ScaleTo actionWithDuration:0.1f scale:1.2f];
+		zoomAction.tag = kZoomActionTag;
+		[self runAction:zoomAction];
 	}
 }
 
@@ -229,10 +359,12 @@ enum {
 {
 	// subclass to change the default action
 	if(isEnabled) {
-		[self stopAction: zoomAction];
-		[zoomAction release];
-		zoomAction = [[ScaleTo actionWithDuration:0.1 scale:1.0] retain];
-		[self do:zoomAction];
+		[self stopActionByTag:kZoomActionTag];
+
+		Action *zoomAction = [ScaleTo actionWithDuration:0.1f scale:1.0f];
+		zoomAction.tag = kZoomActionTag;
+
+		[self runAction:zoomAction];
 	}
 }
 
@@ -308,7 +440,7 @@ enum {
 	[disabledImage setOpacity:opacity];
 	
 	CGSize s = [normalImage contentSize];
-	transformAnchor = cpv( s.width/2, s.height/2 );
+	transformAnchor = ccp( s.width/2, s.height/2 );
 
 	return self;
 }
@@ -380,7 +512,7 @@ enum {
 //
 @implementation MenuItemToggle
 
-@synthesize selectedIndex;
+@synthesize subItems = subItems_;
 
 +(id) itemWithTarget: (id)t selector: (SEL)sel items: (MenuItem*) item, ...
 {
@@ -395,39 +527,59 @@ enum {
 
 -(id) initWithTarget: (id)t selector: (SEL)sel items:(MenuItem*) item vaList: (va_list) args
 {
-	if( !(self=[super initWithTarget:t selector:sel]) )
-		return nil;
+	if( (self=[super initWithTarget:t selector:sel]) ) {
 	
-	selectedIndex = 0;
-	subItems = [[NSMutableArray arrayWithCapacity:2] retain];
-	
-	int z = 0;
-	MenuItem *i = item;
-	while(i) {
-		z++;
-		[subItems addObject:i];
-		i = va_arg(args, MenuItem*);
-	}
+		self.subItems = [NSMutableArray arrayWithCapacity:2];
+		
+		int z = 0;
+		MenuItem *i = item;
+		while(i) {
+			z++;
+			[subItems_ addObject:i];
+			i = va_arg(args, MenuItem*);
+		}
 
-	[self add: [subItems objectAtIndex:selectedIndex] z:0 tag:kCurrentItem];
+		selectedIndex_ = NSUIntegerMax;
+		[self setSelectedIndex:0];
+	}
 	
 	return self;
 }
 
 -(void) dealloc
 {
-	[subItems release];
+	[subItems_ release];
 	[super dealloc];
 }
 
+-(void)setSelectedIndex:(NSUInteger)index
+{
+	if( index != selectedIndex_ ) {
+		selectedIndex_=index;
+		[self removeChildByTag:kCurrentItem cleanup:NO];
+		
+		MenuItem *item = [subItems_ objectAtIndex:selectedIndex_];
+		[self addChild:item z:0 tag:kCurrentItem];
+		
+		CGSize s = [item contentSize];
+		item.position = self.transformAnchor = ccp( s.width/2, s.height/2 );
+	}
+}
+
+-(NSUInteger) selectedIndex
+{
+	return selectedIndex_;
+}
+
+
 -(void) selected
 {
-	[[subItems objectAtIndex:selectedIndex] selected];
+	[[subItems_ objectAtIndex:selectedIndex_] selected];
 }
 
 -(void) unselected
 {
-	[[subItems objectAtIndex:selectedIndex] unselected];
+	[[subItems_ objectAtIndex:selectedIndex_] unselected];
 }
 
 -(void) activate
@@ -435,13 +587,8 @@ enum {
 	// update index
 	
 	if( isEnabled ) {
-		[self removeByTag:kCurrentItem];
-
-		selectedIndex++;
-		if(selectedIndex >= [subItems count])
-			selectedIndex = 0;
-
-		[self add: [subItems objectAtIndex:selectedIndex] z:0 tag:kCurrentItem];
+		NSUInteger newIndex = (selectedIndex_ + 1) % [subItems_ count];
+		[self setSelectedIndex:newIndex];
 
 		[invocation invoke];
 	}
@@ -450,13 +597,13 @@ enum {
 -(void) setIsEnabled: (BOOL)enabled
 {
 	[super setIsEnabled:enabled];
-	for(MenuItem* item in subItems)
+	for(MenuItem* item in subItems_)
 		[item setIsEnabled:enabled];
 }
 
 -(MenuItem*) selectedItem
 {
-	return [subItems objectAtIndex:selectedIndex];
+	return [subItems_ objectAtIndex:selectedIndex_];
 }
 
 -(CGRect) rect
@@ -479,7 +626,7 @@ enum {
 - (void) setOpacity: (GLubyte)newOpacity
 {
 	[super setOpacity:newOpacity];
-	for(MenuItem* item in subItems)
+	for(MenuItem* item in subItems_)
 		[item setOpacity:newOpacity];
 }
 @end
