@@ -22,6 +22,11 @@
 #import "Director.h"
 #import "Support/CGPointExtension.h"
 
+#if 1
+#define RENDER_IN_SUBPIXEL
+#else
+#define RENDER_IN_SUBPIXEL (int)
+#endif
 
 @interface CocosNode (Private)
 -(void) step_: (ccTime) dt;
@@ -462,12 +467,12 @@
 	
 	// transalte
 	if ( relativeTransformAnchor && (transformAnchor.x != 0 || transformAnchor.y != 0 ) )
-		glTranslatef( (int)(-transformAnchor.x + parallaxOffsetX), (int)(-transformAnchor.y + parallaxOffsetY), 0);
+		glTranslatef( RENDER_IN_SUBPIXEL(-transformAnchor.x + parallaxOffsetX), RENDER_IN_SUBPIXEL(-transformAnchor.y + parallaxOffsetY), 0);
 	
 	if (transformAnchor.x != 0 || transformAnchor.y != 0 )
-		glTranslatef( (int)(position.x + transformAnchor.x + parallaxOffsetX), (int)(position.y + transformAnchor.y + parallaxOffsetY), 0);
+		glTranslatef( RENDER_IN_SUBPIXEL(position.x + transformAnchor.x + parallaxOffsetX), RENDER_IN_SUBPIXEL(position.y + transformAnchor.y + parallaxOffsetY), 0);
 	else if ( position.x !=0 || position.y !=0 || parallaxOffsetX != 0 || parallaxOffsetY != 0)
-		glTranslatef( (int)(position.x + parallaxOffsetX), (int)(position.y + parallaxOffsetY), 0 );
+		glTranslatef( RENDER_IN_SUBPIXEL(position.x + parallaxOffsetX), RENDER_IN_SUBPIXEL(position.y + parallaxOffsetY), 0 );
 	
 	// rotate
 	if (rotation != 0.0f )
@@ -479,7 +484,7 @@
 	
 	// restore and re-position point
 	if (transformAnchor.x != 0.0f || transformAnchor.y != 0.0f)
-		glTranslatef((int)(-transformAnchor.x + parallaxOffsetX), (int)(-transformAnchor.y + parallaxOffsetY), 0);
+		glTranslatef(RENDER_IN_SUBPIXEL(-transformAnchor.x + parallaxOffsetX), RENDER_IN_SUBPIXEL(-transformAnchor.y + parallaxOffsetY), 0);
 }
 
 -(float) scale
@@ -698,8 +703,11 @@
 	// b. Retain actions array before loop, release it after loop. Only 1 retain,
 	//    slightly better performance when there are many actions. Need to keep original
 	//    value because actions might get nullified and you don't want [nil release].
-	
-	id actionsBackup = [actions retain];
+
+	// issue #327.
+//	id actionsBackup = [actions retain];
+	[actions retain];
+
 	
 	// call all actions
 	for( Action *action in actions ) {
@@ -716,7 +724,7 @@
 		}
 	}
 	
-	[actionsBackup release];
+	[actions release];
 }
 
 #pragma mark CocosNode Timers 
