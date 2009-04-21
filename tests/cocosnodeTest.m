@@ -431,14 +431,13 @@ Class restartAction()
 		
 		sp1.position = ccp(s.width/2, s.height/2);		
 
-		[self schedule:@selector(doSometing:) interval:1.0f];
+		[self schedule:@selector(shouldNotCrash:) interval:1.0f];
 	}
 	
 	return self;
 }
 
-// The bomb 'explodes' if it expires.
-- (void) doSometing:(ccTime) delta
+- (void) shouldNotCrash:(ccTime) delta
 {	
 	[self unschedule:_cmd];
 
@@ -461,16 +460,16 @@ Class restartAction()
 }
 
 // remove
-- (void) removeMe: (id)node {
-	
-	// crashes
+- (void) removeMe: (id)node
+{	
     [parent removeChild:node cleanup:YES];
+	[self nextCallback:self];
 }
 
 
 -(NSString *) title
 {
-	return @"re-entrant add/remove/schedule";
+	return @"stress test #1";
 }
 @end
 
