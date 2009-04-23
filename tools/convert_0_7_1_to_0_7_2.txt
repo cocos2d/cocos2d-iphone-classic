@@ -74,6 +74,12 @@ b) replace chipmunk macros with CG macros
 //
 
 
+New file:
+---------
+  * Optionally you can include this file:
+     Support/ccArray.h
+  It will be used in v0.8 
+
 Deleted files:
 --------------
   * Delete these files from your project
