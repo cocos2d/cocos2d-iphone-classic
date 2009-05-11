@@ -68,9 +68,16 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 /** Possible texture pixel formats */
 typedef enum {
 	kTexture2DPixelFormat_Automatic = 0,
+	//! 32-bit texture: RGBA8888
 	kTexture2DPixelFormat_RGBA8888,
+	//! 16-bit texture: used with images that have alpha pre-multiplied
 	kTexture2DPixelFormat_RGB565,
+	//! 8-bit textures used as masks
 	kTexture2DPixelFormat_A8,
+	//! 16-bit textures: RGBA4444
+	kTexture2DPixelFormat_RGBA4444,
+	//! 16-bit textures: RGB5A1
+	kTexture2DPixelFormat_RGB5A1,
 } Texture2DPixelFormat;
 
 //CLASS INTERFACES:
@@ -166,40 +173,68 @@ typedef struct _ccTexParams {
 
 @interface Texture2D (GLFilter)
 /** sets the min filter, mag filter, wrap s and wrap t texture parameters
+ @deprecated Will be replaced in v0.8
  @warning this function is not thread safe
  */
 +(void) setTexParameters: (ccTexParams*) texParams;
 
 /** returns the min filter, mag filter, wrap s and wrap t texture parameters
+ @deprecated Will be replaced in v0.8
  @warning this function is not thread safe
  */
 +(ccTexParams) texParameters;
 
 /** apply the setted min/mag filter to the current texture
+ @deprecated Will be replaced in v0.8
  @warning this function is not thread safe
  */
 + (void) applyTexParameters;
 
 /** saves in an internal variable the current tex parameters
+ @deprecated Will be replaced in v0.8
  @warning this function is not thread safe and it is not re-entrat
  */
 + (void) saveTexParameters;
 
 /** restores from the internal variable the tex parameters
+ @deprecated Will be replaced in v0.8
  @warning this function is not thread safe and it is not re-entrat
  */
 + (void) restoreTexParameters;
 
 /** sets antialias texture parameters
+ @deprecated Will be replaced in v0.8
  @warning this function is not thread safe and it is not re-entrat
  */
 + (void) setAntiAliasTexParameters;
 
 /** sets alias texture parameters
+ @deprecated Will be replaced in v0.8
  @warning this function is not thread safe and it is not re-entrat
  */
 + (void) setAliasTexParameters;
 
 @end
+
+@interface Texture2D (PixelFormat)
+/** sets the default pixel format for UIImages that contains alpha channel.
+ If the UIImage has already alpha pre-multiplied (no alpha channle), then it will create an RGB565 texture.
+ But if the UIImage contains alpha channel, then the options are:
+ - generate 32-bit textures: RGBA8 (defaultt: kTexture2DPixelFormat_RGBA8888)
+ - generate 16-bit textures: RGBA4 (kTexture2DPixelFormat_RGBA4444)
+ - generate 16-bit textures: RGB5A1 (kTexture2DPixelFormat_RGB5A1)
+ 
+ To use this function you MUST disable the "compres .PNG files" in XCode, otherwise all your .PNG images
+ will be pre-multiplied wihtout alpha channel.
+ @since v0.7.3
+ */
++(void) setDefaultAlphaPixelFormat:(Texture2DPixelFormat)format;
+
+/** returns the alpha pixel format
+ @since v0.7.3
+ */
++(Texture2DPixelFormat) defaultAlphaPixelFormat;
+@end
+
 
 

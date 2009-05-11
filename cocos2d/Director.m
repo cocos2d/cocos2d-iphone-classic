@@ -167,10 +167,7 @@ static Director *_sharedDirector = nil;
 // main loop
 //
 - (void) mainLoop
-{
-	// dispatch missing events
-//    while (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, YES) == kCFRunLoopRunHandledSource) {};
-    
+{    
 	/* clear window */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
@@ -889,6 +886,20 @@ static Director *_sharedDirector = nil;
 	
 
 	isRunning = YES;
+
+	SEL selector = @selector(preMainLoop);
+	NSMethodSignature* sig = [[[Director sharedDirector] class]
+							  instanceMethodSignatureForSelector:selector];
+	NSInvocation* invocation = [NSInvocation
+								invocationWithMethodSignature:sig];
+	[invocation setTarget:[Director sharedDirector]];
+	[invocation setSelector:selector];
+	[invocation performSelectorOnMainThread:@selector(invokeWithTarget:)
+								 withObject:[Director sharedDirector] waitUntilDone:NO];	
+}
+
+-(void) preMainLoop
+{
 	while (isRunning) {
 	
 		NSAutoreleasePool *loopPool = [NSAutoreleasePool new];
@@ -904,9 +915,8 @@ static Director *_sharedDirector = nil;
 		while(CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, TRUE) == kCFRunLoopRunHandledSource);
 
 		[loopPool release];
-	}
+	}	
 }
-
 - (void) stopAnimation
 {
 	isRunning = NO;

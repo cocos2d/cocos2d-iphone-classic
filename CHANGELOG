@@ -1,3 +1,7 @@
+version 0.7.3 - xx-May-2009
+ . Director: "new" Fast Director. Attach/Detach, auto-lock, SDK 3.0 works (issue #145, #issue #239, issue #340)
+ . Texture2D: supports 16-bit textures RGB4 and RGB5A1 (issue #356)
+ 
 version 0.7.2 - 23-Apr-2009
  . All: removed chipmunk macros. using CG macros (issue #290)
  . Actions: Added TintTo and TintBy (issue #204)

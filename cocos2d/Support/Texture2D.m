@@ -60,6 +60,12 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 */
 
+/*
+ * Support for RGBA_4_4_4_4 and RGBA_5_5_5_1 was copied from:
+ * https://devforums.apple.com/message/37855#37855 by a1studmuffin
+ */
+
+
 #import <OpenGLES/ES1/glext.h>
 
 #import "Texture2D.h"
@@ -71,6 +77,10 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 #define kMaxTextureSize	 1024
 
 //CLASS IMPLEMENTATIONS:
+
+// If the image has alpha, you can create RGBA8 (32-bit) or RGBA4 (16-bit) or RGB5A1 (16-bit)
+// Default is: RGBA8
+static Texture2DPixelFormat defaultAlphaPixelFormat = kTexture2DPixelFormat_RGBA8888;
 
 // Default Min/Mag texture filter
 static ccTexParams _texParams = { GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE };
@@ -86,13 +96,21 @@ static ccTexParams _texParamsCopy;
 		glGenTextures(1, &_name);
 		glGetIntegerv(GL_TEXTURE_BINDING_2D, &saveName);
 		glBindTexture(GL_TEXTURE_2D, _name);
-
+		
 		[Texture2D applyTexParameters];
 		
-		switch(pixelFormat) {
-			
+		// Specify OpenGL texture image
+		
+		switch(pixelFormat)
+		{
 			case kTexture2DPixelFormat_RGBA8888:
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+				break;
+			case kTexture2DPixelFormat_RGBA4444:
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4, data);
+				break;
+			case kTexture2DPixelFormat_RGB5A1:
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, data);
 				break;
 			case kTexture2DPixelFormat_RGB565:
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, data);
@@ -102,10 +120,11 @@ static ccTexParams _texParamsCopy;
 				break;
 			default:
 				[NSException raise:NSInternalInconsistencyException format:@""];
-			
+				
 		}
+		
 		glBindTexture(GL_TEXTURE_2D, saveName);
-	
+		
 		_size = size;
 		_width = width;
 		_height = height;
@@ -135,12 +154,12 @@ static ccTexParams _texParamsCopy;
 @end
 
 @implementation Texture2D (Image)
-	
+
 - (id) initWithImage:(UIImage *)uiImage
 {
 	NSUInteger				width,
-							height,
-							i;
+	height,
+	i;
 	CGContextRef			context = nil;
 	void*					data = nil;;
 	CGColorSpaceRef			colorSpace;
@@ -164,22 +183,21 @@ static ccTexParams _texParamsCopy;
 		return nil;
 	}
 	
-
+	
 	info = CGImageGetAlphaInfo(image);
 	hasAlpha = ((info == kCGImageAlphaPremultipliedLast) || (info == kCGImageAlphaPremultipliedFirst) || (info == kCGImageAlphaLast) || (info == kCGImageAlphaFirst) ? YES : NO);
 	size_t bpp = CGImageGetBitsPerComponent(image);
 	if(CGImageGetColorSpace(image)) {
 		if(hasAlpha || bpp >= 8)
-			pixelFormat = kTexture2DPixelFormat_RGBA8888;
+			pixelFormat = defaultAlphaPixelFormat;
 		else
 			pixelFormat = kTexture2DPixelFormat_RGB565;
 	} else  //NOTE: No colorspace means a mask image
 		pixelFormat = kTexture2DPixelFormat_A8;
 	
-	
 	imageSize = CGSizeMake(CGImageGetWidth(image), CGImageGetHeight(image));
 	transform = CGAffineTransformIdentity;
-
+	
 	width = imageSize.width;
 	
 	if((width != 1) && (width & (width - 1))) {
@@ -203,8 +221,12 @@ static ccTexParams _texParamsCopy;
 		imageSize.height *= 0.5f;
 	}
 	
-	switch(pixelFormat) {		
+	// Create the bitmap graphics context
+	
+	switch(pixelFormat) {          
 		case kTexture2DPixelFormat_RGBA8888:
+		case kTexture2DPixelFormat_RGBA4444:
+		case kTexture2DPixelFormat_RGB5A1:
 			colorSpace = CGColorSpaceCreateDeviceRGB();
 			data = malloc(height * width * 4);
 			context = CGBitmapContextCreate(data, width, height, 8, 4 * width, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
@@ -216,24 +238,26 @@ static ccTexParams _texParamsCopy;
 			context = CGBitmapContextCreate(data, width, height, 8, 4 * width, colorSpace, kCGImageAlphaNoneSkipLast | kCGBitmapByteOrder32Big);
 			CGColorSpaceRelease(colorSpace);
 			break;
-			
 		case kTexture2DPixelFormat_A8:
 			data = malloc(height * width);
 			context = CGBitmapContextCreate(data, width, height, 8, width, NULL, kCGImageAlphaOnly);
-			break;				
+			break;                    
 		default:
 			[NSException raise:NSInternalInconsistencyException format:@"Invalid pixel format"];
 	}
- 
-
+	
+	
 	CGContextClearRect(context, CGRectMake(0, 0, width, height));
 	CGContextTranslateCTM(context, 0, height - imageSize.height);
 	
 	if(!CGAffineTransformIsIdentity(transform))
 		CGContextConcatCTM(context, transform);
 	CGContextDrawImage(context, CGRectMake(0, 0, CGImageGetWidth(image), CGImageGetHeight(image)), image);
-	//Convert "RRRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA" to "RRRRRGGGGGGBBBBB"
+	
+	// Repack the pixel data into the right format
+	
 	if(pixelFormat == kTexture2DPixelFormat_RGB565) {
+		//Convert "RRRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA" to "RRRRRGGGGGGBBBBB"
 		tempData = malloc(height * width * 2);
 		inPixel32 = (unsigned int*)data;
 		outPixel16 = (unsigned short*)tempData;
@@ -242,6 +266,39 @@ static ccTexParams _texParamsCopy;
 		free(data);
 		data = tempData;
 		
+	}
+	else if (pixelFormat == kTexture2DPixelFormat_RGBA4444) {
+		//Convert "RRRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA" to "RRRRGGGGBBBBAAAA"
+		tempData = malloc(height * width * 2);
+		inPixel32 = (unsigned int*)data;
+		outPixel16 = (unsigned short*)tempData;
+		for(i = 0; i < width * height; ++i, ++inPixel32)
+			*outPixel16++ = 
+			((((*inPixel32 >> 0) & 0xFF) >> 4) << 12) | // R
+			((((*inPixel32 >> 8) & 0xFF) >> 4) << 8) | // G
+			((((*inPixel32 >> 16) & 0xFF) >> 4) << 4) | // B
+			((((*inPixel32 >> 24) & 0xFF) >> 4) << 0); // A
+		
+		
+		free(data);
+		data = tempData;
+		
+	}
+	else if (pixelFormat == kTexture2DPixelFormat_RGB5A1) {
+		//Convert "RRRRRRRRRGGGGGGGGBBBBBBBBAAAAAAAA" to "RRRRRGGGGGBBBBBA"
+		tempData = malloc(height * width * 2);
+		inPixel32 = (unsigned int*)data;
+		outPixel16 = (unsigned short*)tempData;
+		for(i = 0; i < width * height; ++i, ++inPixel32)
+			*outPixel16++ = 
+			((((*inPixel32 >> 0) & 0xFF) >> 3) << 11) | // R
+			((((*inPixel32 >> 8) & 0xFF) >> 3) << 6) | // G
+			((((*inPixel32 >> 16) & 0xFF) >> 3) << 1) | // B
+			((((*inPixel32 >> 24) & 0xFF) >> 7) << 0); // A
+		
+		
+		free(data);
+		data = tempData;
 	}
 	self = [self initWithData:data pixelFormat:pixelFormat pixelsWide:width pixelsHigh:height contentSize:imageSize];
 	
@@ -458,6 +515,21 @@ static ccTexParams _texParamsCopy;
 {
 	_texParams.magFilter = _texParams.minFilter = GL_LINEAR;
 }
-
 @end
+
+//
+// Texture options for images that contains alpha
+//
+@implementation Texture2D (PixelFormat)
++(void) setDefaultAlphaPixelFormat:(Texture2DPixelFormat)format
+{
+	defaultAlphaPixelFormat = format;
+}
+
++(Texture2DPixelFormat) defaultAlphaPixelFormat
+{
+	return defaultAlphaPixelFormat;
+}
+@end
+
 

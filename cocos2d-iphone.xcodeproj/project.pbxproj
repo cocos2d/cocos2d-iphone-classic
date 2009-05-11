@@ -324,9 +324,6 @@
 		505B639E0F2F4210001B4104 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D500B990D5A79CF00DBA0E3 /* QuartzCore.framework */; };
 		505B639F0F2F4210001B4104 /* libcocos2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5018F24D0DFDEAC400C013A5 /* libcocos2d.a */; };
 		505B63A80F2F4295001B4104 /* EaseActionsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 505B63A70F2F4295001B4104 /* EaseActionsTest.m */; };
-		505CC1840F62BB7A000EDF26 /* CocosNodePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 505CC17D0F62BB7A000EDF26 /* CocosNodePerformance.m */; };
-		505CC1850F62BB7A000EDF26 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 505CC17F0F62BB7A000EDF26 /* AppController.m */; };
-		505CC1860F62BB7A000EDF26 /* MainScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 505CC1810F62BB7A000EDF26 /* MainScene.m */; };
 		505CC1B20F62BC6F000EDF26 /* b1.png in Resources */ = {isa = PBXBuildFile; fileRef = 5001659D0E72DB470085673F /* b1.png */; };
 		505CC1B30F62BC6F000EDF26 /* b2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5001659E0E72DB470085673F /* b2.png */; };
 		505CC1B40F62BC6F000EDF26 /* f1.png in Resources */ = {isa = PBXBuildFile; fileRef = 5001659F0E72DB470085673F /* f1.png */; };
@@ -449,6 +446,9 @@
 		5078B52A0E3E43540004233A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D500B990D5A79CF00DBA0E3 /* QuartzCore.framework */; };
 		5078B52B0E3E43540004233A /* libcocos2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5018F24D0DFDEAC400C013A5 /* libcocos2d.a */; };
 		5078B5340E3E437F0004233A /* IntervalTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5078B5330E3E437F0004233A /* IntervalTest.m */; };
+		507BB84E0FB831A70023CD67 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 507BB8490FB831A70023CD67 /* AppController.m */; };
+		507BB84F0FB831A70023CD67 /* CocosNodePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 507BB84B0FB831A70023CD67 /* CocosNodePerformance.m */; };
+		507BB8500FB831A70023CD67 /* MainScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 507BB84D0FB831A70023CD67 /* MainScene.m */; };
 		5084D25D0EE5906100BD237C /* powered.png in Resources */ = {isa = PBXBuildFile; fileRef = 5084D25C0EE5906100BD237C /* powered.png */; };
 		5084D47E0EE5C7D100BD237C /* btn-about-normal.png in Resources */ = {isa = PBXBuildFile; fileRef = 5084D4780EE5C7D100BD237C /* btn-about-normal.png */; };
 		5084D47F0EE5C7D100BD237C /* btn-about-selected.png in Resources */ = {isa = PBXBuildFile; fileRef = 5084D4790EE5C7D100BD237C /* btn-about-selected.png */; };
@@ -1232,13 +1232,7 @@
 		505B63A30F2F4210001B4104 /* EaseActionsTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EaseActionsTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		505B63A60F2F4295001B4104 /* EaseActionsTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EaseActionsTest.h; path = tests/EaseActionsTest.h; sourceTree = "<group>"; };
 		505B63A70F2F4295001B4104 /* EaseActionsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EaseActionsTest.m; path = tests/EaseActionsTest.m; sourceTree = "<group>"; };
-		505CC1590F62BB03000EDF26 /* PerformanceTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerformanceTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		505CC17C0F62BB7A000EDF26 /* CocosNodePerformance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CocosNodePerformance.h; sourceTree = "<group>"; };
-		505CC17D0F62BB7A000EDF26 /* CocosNodePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocosNodePerformance.m; sourceTree = "<group>"; };
-		505CC17E0F62BB7A000EDF26 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
-		505CC17F0F62BB7A000EDF26 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; };
-		505CC1800F62BB7A000EDF26 /* MainScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainScene.h; sourceTree = "<group>"; };
-		505CC1810F62BB7A000EDF26 /* MainScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainScene.m; sourceTree = "<group>"; };
+		505CC1590F62BB03000EDF26 /* PerformanceSpriteTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerformanceSpriteTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		505CC1C90F62BCEE000EDF26 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		505CC1CB0F62BCEF000EDF26 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		505CC1CD0F62BCEF000EDF26 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -1280,6 +1274,12 @@
 		506C80120E041CDB00B48100 /* SceneTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SceneTest.m; path = tests/SceneTest.m; sourceTree = "<group>"; };
 		5078B5320E3E437F0004233A /* IntervalTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IntervalTest.h; path = tests/IntervalTest.h; sourceTree = "<group>"; };
 		5078B5330E3E437F0004233A /* IntervalTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IntervalTest.m; path = tests/IntervalTest.m; sourceTree = "<group>"; };
+		507BB8480FB831A70023CD67 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
+		507BB8490FB831A70023CD67 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; };
+		507BB84A0FB831A70023CD67 /* CocosNodePerformance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CocosNodePerformance.h; sourceTree = "<group>"; };
+		507BB84B0FB831A70023CD67 /* CocosNodePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocosNodePerformance.m; sourceTree = "<group>"; };
+		507BB84C0FB831A70023CD67 /* MainScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainScene.h; sourceTree = "<group>"; };
+		507BB84D0FB831A70023CD67 /* MainScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainScene.m; sourceTree = "<group>"; };
 		5084D25C0EE5906100BD237C /* powered.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = powered.png; sourceTree = "<group>"; };
 		5084D4780EE5C7D100BD237C /* btn-about-normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "btn-about-normal.png"; sourceTree = "<group>"; };
 		5084D4790EE5C7D100BD237C /* btn-about-selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "btn-about-selected.png"; sourceTree = "<group>"; };
@@ -1935,7 +1935,7 @@
 				50A783C40F3AFCE500104C45 /* StreakTest.app */,
 				50D56FD20F3FABEC007CD6B9 /* EffectsAdvancedTest.app */,
 				504828800F45AED700A30CEF /* AttachTest.app */,
-				505CC1590F62BB03000EDF26 /* PerformanceTest.app */,
+				505CC1590F62BB03000EDF26 /* PerformanceSpriteTest.app */,
 				8EDF3ED80F6BDA0000F54643 /* SoundEngineTest.app */,
 				8E6CBEEF0F7A758000D47B3A /* libvorbis.a */,
 				501C7C910F91EFFF0024A296 /* AtlasSpriteTest.app */,
@@ -2207,18 +2207,18 @@
 			path = tests/attachDemo;
 			sourceTree = "<group>";
 		};
-		505CC17B0F62BB7A000EDF26 /* PerformanceTest */ = {
+		507BB8470FB831A70023CD67 /* PerformanceSpriteTest */ = {
 			isa = PBXGroup;
 			children = (
-				505CC17C0F62BB7A000EDF26 /* CocosNodePerformance.h */,
-				505CC17D0F62BB7A000EDF26 /* CocosNodePerformance.m */,
-				505CC17E0F62BB7A000EDF26 /* AppController.h */,
-				505CC17F0F62BB7A000EDF26 /* AppController.m */,
-				505CC1800F62BB7A000EDF26 /* MainScene.h */,
-				505CC1810F62BB7A000EDF26 /* MainScene.m */,
+				507BB8480FB831A70023CD67 /* AppController.h */,
+				507BB8490FB831A70023CD67 /* AppController.m */,
+				507BB84A0FB831A70023CD67 /* CocosNodePerformance.h */,
+				507BB84B0FB831A70023CD67 /* CocosNodePerformance.m */,
+				507BB84C0FB831A70023CD67 /* MainScene.h */,
+				507BB84D0FB831A70023CD67 /* MainScene.m */,
 			);
-			name = PerformanceTest;
-			path = tests/PerformanceTest;
+			name = PerformanceSpriteTest;
+			path = tests/PerformanceSpriteTest;
 			sourceTree = "<group>";
 		};
 		509B3A100F31027600F2FB95 /* cocoslive */ = {
@@ -2331,9 +2331,9 @@
 		50B130FC0DFE0923003BAB56 /* tests */ = {
 			isa = PBXGroup;
 			children = (
-				505CC17B0F62BB7A000EDF26 /* PerformanceTest */,
 				504828C70F45B15700A30CEF /* attachDemo */,
 				50175B240F33B22300624901 /* cocosLiveDemo */,
+				507BB8470FB831A70023CD67 /* PerformanceSpriteTest */,
 				317070360E29409E00DD3360 /* AccelViewportTest.h */,
 				317070350E29409E00DD3360 /* AccelViewportTest.m */,
 				506881E60E9575E100F943E5 /* AtlasTest.h */,
@@ -2903,9 +2903,9 @@
 			productReference = 505B63A30F2F4210001B4104 /* EaseActionsTest.app */;
 			productType = "com.apple.product-type.application";
 		};
-		505CC1580F62BB03000EDF26 /* PerformanceTest */ = {
+		505CC1580F62BB03000EDF26 /* PerformanceSpriteTest */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 505CC15E0F62BB05000EDF26 /* Build configuration list for PBXNativeTarget "PerformanceTest" */;
+			buildConfigurationList = 505CC15E0F62BB05000EDF26 /* Build configuration list for PBXNativeTarget "PerformanceSpriteTest" */;
 			buildPhases = (
 				505CC1550F62BB03000EDF26 /* Resources */,
 				505CC1560F62BB03000EDF26 /* Sources */,
@@ -2916,9 +2916,9 @@
 			dependencies = (
 				505CC1C40F62BCCB000EDF26 /* PBXTargetDependency */,
 			);
-			name = PerformanceTest;
+			name = PerformanceSpriteTest;
 			productName = PerformanceTest;
-			productReference = 505CC1590F62BB03000EDF26 /* PerformanceTest.app */;
+			productReference = 505CC1590F62BB03000EDF26 /* PerformanceSpriteTest.app */;
 			productType = "com.apple.product-type.application";
 		};
 		506143F10E589A2E003CCDB7 /* cocosnodeTest */ = {
@@ -3334,7 +3334,7 @@
 				506C79F20E01C73A00B48100 /* MenuTest */,
 				50C1953E0EE4B57E00829067 /* ParallaxTest */,
 				50DB1BB10E1C1E5900A89DFF /* ParticleTest */,
-				505CC1580F62BB03000EDF26 /* PerformanceTest */,
+				505CC1580F62BB03000EDF26 /* PerformanceSpriteTest */,
 				502C66170DFEFCCA00E4107D /* RotateWorldTest */,
 				506C7FF70E041C9300B48100 /* SceneTest */,
 				8EDF3EA90F6BDA0000F54643 /* SoundEngineTest (experimental) */,
@@ -4112,9 +4112,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				505CC1D70F62BD59000EDF26 /* main.m in Sources */,
-				505CC1840F62BB7A000EDF26 /* CocosNodePerformance.m in Sources */,
-				505CC1850F62BB7A000EDF26 /* AppController.m in Sources */,
-				505CC1860F62BB7A000EDF26 /* MainScene.m in Sources */,
+				507BB84E0FB831A70023CD67 /* AppController.m in Sources */,
+				507BB84F0FB831A70023CD67 /* CocosNodePerformance.m in Sources */,
+				507BB8500FB831A70023CD67 /* MainScene.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4951,8 +4951,10 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/UIKit.framework/Headers/UIKit.h";
+				GCC_VERSION = 4.2;
 				INFOPLIST_FILE = Resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-framework",
@@ -4961,7 +4963,7 @@
 					UIKit,
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = PerformanceTest;
+				PRODUCT_NAME = PerformanceSpriteTest;
 				SDKROOT = iphoneos2.2.1;
 			};
 			name = Debug;
@@ -4976,8 +4978,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/UIKit.framework/Headers/UIKit.h";
+				GCC_VERSION = 4.2;
 				INFOPLIST_FILE = Resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-framework",
@@ -4986,7 +4990,7 @@
 					UIKit,
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = PerformanceTest;
+				PRODUCT_NAME = PerformanceSpriteTest;
 				SDKROOT = iphoneos2.2.1;
 				ZERO_LINK = NO;
 			};
@@ -6188,7 +6192,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		505CC15E0F62BB05000EDF26 /* Build configuration list for PBXNativeTarget "PerformanceTest" */ = {
+		505CC15E0F62BB05000EDF26 /* Build configuration list for PBXNativeTarget "PerformanceSpriteTest" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				505CC15C0F62BB04000EDF26 /* Debug */,
