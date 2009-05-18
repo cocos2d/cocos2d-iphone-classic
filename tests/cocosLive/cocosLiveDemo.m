@@ -6,7 +6,7 @@
 
 //
 // To view these scores online, go here:
-// http://www.cocoslive.net/game-scores?gamename=DemoGame%202
+// http://www.cocoslive.net/game-scores?gamename=DemoGame%203
 //
 
 //
@@ -63,7 +63,7 @@
 {
 	NSLog(@"Requesting scores...");
 
-	ScoreServerRequest *request = [[ScoreServerRequest alloc] initWithGameName:@"DemoGame 2" delegate:self];
+	ScoreServerRequest *request = [[ScoreServerRequest alloc] initWithGameName:@"DemoGame 3" delegate:self];
 	
 	NSString *cat = @"easy";
 	
@@ -79,7 +79,7 @@
 			break;
 	}
 
-	// The only supported flag as of v0.2 is kQueryFlagByCountry and kQueryFlagByDevice
+	// The only supported flags as of v0.2 is kQueryFlagByCountry and kQueryFlagByDevice
 	tQueryFlags flags = kQueryFlagIgnore;
 	if( world == kCountry )
 		flags = kQueryFlagByCountry;
@@ -98,10 +98,10 @@
 {
 	NSLog(@"Posting Score");
 
-	// Create que "post" object for the game "DemoGame 2"
+	// Create que "post" object for the game "DemoGame 3"
 	// The gameKey is the secret key that is generated when you create you game in cocos live.
 	// This secret key is used to prevent spoofing the high scores
-	ScoreServerPost *server = [[ScoreServerPost alloc] initWithGameName:@"DemoGame 2" gameKey:@"1ad0ba5afd763c6bdaa2429cfc99b3be" delegate:self];
+	ScoreServerPost *server = [[ScoreServerPost alloc] initWithGameName:@"DemoGame 3" gameKey:@"f35a4350b63afcb4e87c88b01ecc64b6" delegate:self];
 
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:2];
 
@@ -112,6 +112,7 @@
 	// cc_ files are predefined cocoslive fields.
 	// set score
 	[dict setObject: [NSNumber numberWithInt: [self getRandomWithMax:20000] ] forKey:@"cc_score"];
+
 	// set playername
 	[dict setObject:name forKey:@"cc_playername"];
 
@@ -146,8 +147,11 @@
 //	[server sendScore:dict];
 	
 	// Or you can "update" your score instead of adding a new one.
-	// To do that, cc_playername must exists.
 	// The score will be udpated only if it is better than the previous one
+	// 
+	// "update score" is the recommend way since it can be treated like a profile
+	// and it has some benefits like: "tell me if my score was beaten", etc.
+	// It also supports "world ranking". eg: "What's my ranking ?"
 	[server updateScore:dict];
 	
 	// Release. It won't be freed from memory until the connection fails or suceeds
@@ -160,6 +164,14 @@
 -(void) scorePostOk: (id) sender
 {
 	NSLog(@"score post OK");
+	if( [sender ranking] != kServerPostInvalidRanking && [sender scoreDidUpdate]) {
+		NSString *message = [NSString stringWithFormat:@"World ranking: %d", [sender ranking]];
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Post Ok." message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil];	
+		alert.tag = 2;
+		[alert show];
+		[alert release];		
+		
+	}
 }
 
 -(void) scorePostFail: (id) sender

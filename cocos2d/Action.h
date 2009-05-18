@@ -18,6 +18,7 @@
 #import "ccTypes.h"
 
 enum {
+	//! Default tag
 	kActionTagInvalid = -1,
 };
 
@@ -29,7 +30,9 @@ enum {
 	int tag;
 }
 
-@property (readwrite,retain) CocosNode *target;
+/** The "target". The action will modify the target properties */
+@property (readwrite,assign) CocosNode *target;
+/** The action tag. An identifier of the action */
 @property (readwrite,assign) int tag;
 
 +(id) action;
@@ -52,6 +55,24 @@ enum {
 //! * 1 means that the action is over
 -(void) update: (ccTime) time;
 
+@end
+
+/** Base class actions that do have a finite time duration.
+ Possible actions:
+   - An action with a duration of 0 seconds
+   - An action with a duration of 35.5 seconds
+ Infitite time actions are valid
+ */
+@interface FiniteTimeAction : Action <NSCopying>
+{
+	//! duration in seconds
+	ccTime duration;
+}
+//! duration in seconds of the action
+@property (readwrite) ccTime duration;
+
+/** returns a reversed action */
+- (FiniteTimeAction*) reverse;
 @end
 
 

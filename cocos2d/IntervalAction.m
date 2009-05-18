@@ -21,9 +21,11 @@
 //
 // IntervalAction
 //
+#pragma mark -
+#pragma mark IntervalAction
 @implementation IntervalAction
 
-@synthesize elapsed, duration;
+@synthesize elapsed;
 
 -(id) init
 {
@@ -94,22 +96,24 @@
 //
 // Sequence
 //
+#pragma mark -
+#pragma mark Sequence
 @implementation Sequence
-+(id) actionOne: (IntervalAction*) one two: (IntervalAction*) two
++(id) actionOne: (FiniteTimeAction*) one two: (FiniteTimeAction*) two
 {	
 	return [[[self alloc] initOne:one two:two ] autorelease];
 }
 
-+(id) actions: (IntervalAction*) action1, ...
++(id) actions: (FiniteTimeAction*) action1, ...
 {
 	va_list params;
 	va_start(params,action1);
 	
-	IntervalAction *now;
-	IntervalAction *prev = action1;
+	FiniteTimeAction *now;
+	FiniteTimeAction *prev = action1;
 	
 	while( action1 ) {
-		now = va_arg(params,IntervalAction*);
+		now = va_arg(params,FiniteTimeAction*);
 		if ( now )
 			prev = [Sequence actionOne: prev two: now];
 		else
@@ -119,13 +123,13 @@
 	return prev;
 }
 
--(id) initOne: (IntervalAction*) one_ two: (IntervalAction*) two_
+-(id) initOne: (FiniteTimeAction*) one_ two: (FiniteTimeAction*) two_
 {
 	NSAssert( one_!=nil, @"Sequence: argument one must be non-nil");
 	NSAssert( two_!=nil, @"Sequence: argument two must be non-nil");
 
-	IntervalAction *one = one_;
-	IntervalAction *two = two_;
+	FiniteTimeAction *one = one_;
+	FiniteTimeAction *two = two_;
 		
 	ccTime d = [one duration] + [two duration];
 	[super initWithDuration: d];
@@ -202,13 +206,15 @@
 //
 // Repeat
 //
+#pragma mark -
+#pragma mark Repeat
 @implementation Repeat
-+(id) actionWithAction: (IntervalAction*) action times: (unsigned int) t
++(id) actionWithAction: (FiniteTimeAction*) action times: (unsigned int) t
 {
 	return [[[self alloc] initWithAction: action times: t] autorelease];
 }
 
--(id) initWithAction: (IntervalAction*) action times: (unsigned int) t
+-(id) initWithAction: (FiniteTimeAction*) action times: (unsigned int) t
 {
 	int d = [action duration] * t;
 
@@ -286,17 +292,20 @@
 //
 // Spawn
 //
+#pragma mark -
+#pragma mark Spawn
+
 @implementation Spawn
-+(id) actions: (IntervalAction*) action1, ...
++(id) actions: (FiniteTimeAction*) action1, ...
 {
 	va_list params;
 	va_start(params,action1);
 	
-	IntervalAction *now;
-	IntervalAction *prev = action1;
+	FiniteTimeAction *now;
+	FiniteTimeAction *prev = action1;
 	
 	while( action1 ) {
-		now = va_arg(params,IntervalAction*);
+		now = va_arg(params,FiniteTimeAction*);
 		if ( now )
 			prev = [Spawn actionOne: prev two: now];
 		else
@@ -306,12 +315,12 @@
 	return prev;
 }
 
-+(id) actionOne: (IntervalAction*) one two: (IntervalAction*) two
++(id) actionOne: (FiniteTimeAction*) one two: (FiniteTimeAction*) two
 {	
 	return [[[self alloc] initOne:one two:two ] autorelease];
 }
 
--(id) initOne: (IntervalAction*) one_ two: (IntervalAction*) two_
+-(id) initOne: (FiniteTimeAction*) one_ two: (FiniteTimeAction*) two_
 {
 	NSAssert( one_!=nil, @"Spawn: argument one must be non-nil");
 	NSAssert( two_!=nil, @"Spawn: argument two must be non-nil");
@@ -371,6 +380,9 @@
 //
 // RotateTo
 //
+#pragma mark -
+#pragma mark RotateTo
+
 @implementation RotateTo
 +(id) actionWithDuration: (ccTime) t angle:(float) a
 {	
@@ -412,6 +424,9 @@
 //
 // RotateBy
 //
+#pragma mark -
+#pragma mark RotateBy
+
 @implementation RotateBy
 +(id) actionWithDuration: (ccTime) t angle:(float) a
 {	
@@ -455,6 +470,9 @@
 //
 // MoveTo
 //
+#pragma mark -
+#pragma mark MoveTo
+
 @implementation MoveTo
 +(id) actionWithDuration: (ccTime) t position: (CGPoint) p
 {	
@@ -492,6 +510,9 @@
 //
 // MoveBy
 //
+#pragma mark -
+#pragma mark MoveBy
+
 @implementation MoveBy
 +(id) actionWithDuration: (ccTime) t position: (CGPoint) p
 {	
@@ -529,6 +550,9 @@
 //
 // JumpBy
 //
+#pragma mark -
+#pragma mark JumpBy
+
 @implementation JumpBy
 +(id) actionWithDuration: (ccTime) t position: (CGPoint) pos height: (ccTime) h jumps:(int)j
 {
@@ -575,6 +599,9 @@
 //
 // JumpTo
 //
+#pragma mark -
+#pragma mark JumpTo
+
 @implementation JumpTo
 -(void) start
 {
@@ -583,9 +610,87 @@
 }
 @end
 
+
+#pragma mark -
+#pragma mark BezierBy
+
+// Bezier cubic formula:
+//	((1 - t) + t)3 = 1 
+// Expands to… 
+//   (1 - t)3 + 3t(1-t)2 + 3t2(1 - t) + t3 = 1 
+static inline float bezierat( float a, float b, float c, float d, ccTime t )
+{
+	return (powf(1-t,3) * a + 
+			3*t*(powf(1-t,2))*b + 
+			3*powf(t,2)*(1-t)*c +
+			powf(t,3)*d );
+}
+
+//
+// BezierBy
+//
+@implementation BezierBy
++(id) actionWithDuration: (ccTime) t bezier:(ccBezierConfig) c
+{	
+	return [[[self alloc] initWithDuration:t bezier:c ] autorelease];
+}
+
+-(id) initWithDuration: (ccTime) t bezier:(ccBezierConfig) c
+{
+	if( (self=[super initWithDuration: t]) ) {
+		config = c;
+	}
+	return self;
+}
+
+-(id) copyWithZone: (NSZone*) zone
+{
+	Action *copy = [[[self class] allocWithZone: zone] initWithDuration: [self duration] bezier: config];
+    return copy;
+}
+
+-(void) start
+{
+	[super start];
+	startPosition = target.position;
+}
+
+-(void) update: (ccTime) t
+{
+	float xa = config.startPosition.x;
+	float xb = config.controlPoint_1.x;
+	float xc = config.controlPoint_2.x;
+	float xd = config.endPosition.x;
+	
+	float ya = config.startPosition.y;
+	float yb = config.controlPoint_1.y;
+	float yc = config.controlPoint_2.y;
+	float yd = config.endPosition.y;
+	
+	float x = bezierat(xa, xb, xc, xd, t);
+	float y = bezierat(ya, yb, yc, yd, t);
+	target.position = ccpAdd( startPosition, ccp(x,y));
+}
+
+- (IntervalAction*) reverse
+{
+	// XXX: reverse it's not working as expected
+	ccBezierConfig r;
+	r.startPosition = ccpNeg( config.startPosition);
+	r.endPosition = ccpNeg(config.endPosition);
+	r.controlPoint_1 = ccpNeg(config.controlPoint_1);
+	r.controlPoint_2 = ccpNeg(config.controlPoint_2);
+	
+	BezierBy *action = [BezierBy actionWithDuration:[self duration] bezier:r];
+	return action;
+}
+@end
+
 //
 // ScaleTo
 //
+#pragma mark -
+#pragma mark ScaleTo
 @implementation ScaleTo
 +(id) actionWithDuration: (ccTime) t scale:(float) s
 {
@@ -642,6 +747,8 @@
 //
 // ScaleBy
 //
+#pragma mark -
+#pragma mark ScaleBy
 @implementation ScaleBy
 -(void) start
 {
@@ -659,6 +766,8 @@
 //
 // Blink
 //
+#pragma mark -
+#pragma mark Blink
 @implementation Blink
 +(id) actionWithDuration: (ccTime) t blinks: (unsigned int) b
 {
@@ -696,6 +805,8 @@
 //
 // FadeIn
 //
+#pragma mark -
+#pragma mark FadeIn
 @implementation FadeIn
 -(void) update: (ccTime) t
 {
@@ -710,6 +821,8 @@
 //
 // FadeOut
 //
+#pragma mark -
+#pragma mark FadeOut
 @implementation FadeOut
 -(void) update: (ccTime) t
 {
@@ -724,6 +837,8 @@
 //
 // FadeTo
 //
+#pragma mark -
+#pragma mark FadeTo
 @implementation FadeTo
 +(id) actionWithDuration: (ccTime) t opacity: (GLubyte) o
 {
@@ -758,6 +873,7 @@
 //
 // TintTo
 //
+#pragma mark -
 #pragma mark TintTo
 @implementation TintTo
 +(id) actionWithDuration:(ccTime)t red:(GLubyte)r green:(GLubyte)g blue:(GLubyte)b
@@ -802,6 +918,7 @@
 //
 // TintBy
 //
+#pragma mark -
 #pragma mark TintBy
 @implementation TintBy
 +(id) actionWithDuration:(ccTime)t red:(GLshort)r green:(GLshort)g blue:(GLshort)b
@@ -846,116 +963,10 @@
 @end
 
 //
-// Accelerate
-//
-#pragma mark Accelerate
-@implementation Accelerate
-@synthesize rate;
-+ (id) actionWithAction: (IntervalAction*) action rate: (float) r
-{
-	return [[[self alloc] initWithAction:action rate:r ] autorelease];
-}
-
-- (id) initWithAction: (IntervalAction*) action rate: (float) r
-{	
-	NSAssert( action!=nil, @"Accelerate: argument action must be non-nil");
-
-	if( ! (self=[super initWithDuration: [action duration]]) )
-		return nil;
-
-	other = [action retain];
-	
-	rate = r;
-	return self;
-}
-
--(id) copyWithZone: (NSZone*) zone
-{
-	Action *copy = [[[self class] allocWithZone: zone] initWithAction: [[other copy] autorelease] rate: rate];
-	return copy;
-}
-
-- (void) dealloc
-{
-	[other release];
-	[super dealloc];
-}
-
-- (void) start
-{
-	[super start];
-	other.target = target;
-	[other start];
-}
-
-- (void) update: (ccTime) t
-{
-	[other update: powf(t,rate) ];
-}
-
-- (IntervalAction*) reverse
-{
-	return [Accelerate actionWithAction: [other reverse] rate: 1/rate];
-}
-@end
-
-//
-// AccelDeccel
-//
-@implementation AccelDeccel
-+(id) actionWithAction: (IntervalAction*) action
-{
-	return [[[self alloc] initWithAction: action ] autorelease ];
-}
-
--(id) initWithAction: (IntervalAction*) action
-{
-	NSAssert( action!=nil, @"AccelDeccel: argument action must be non-nil");
-
-	if( !(self=[super initWithDuration: action.duration ]) )
-		return nil;
-
-	other = [action retain];
-	
-	return self;
-}
-
--(id) copyWithZone: (NSZone*) zone
-{
-	Action *copy = [[[self class] allocWithZone: zone] initWithAction: [[other copy] autorelease] ];
-	return copy;
-}
-
--(void) dealloc
-{
-	[other release];
-	[super dealloc];
-}
-
--(void) start
-{
-	[super start];
-	other.target = target;
-	[other start];
-}
-
--(void) update: (ccTime) t
-{
-	ccTime ft = (t-0.5f) * 12;
-	ccTime nt = 1.0f/( 1.0f + expf(-ft) );
-	[other update: nt];	
-}
-
--(IntervalAction*) reverse
-{
-	return [AccelDeccel actionWithAction: [other reverse]];
-}
-@end
-
-
-//
 // DelayTime
 //
+#pragma mark -
+#pragma mark DelayTime
 @implementation DelayTime
 -(void) update: (ccTime) t
 {
@@ -971,14 +982,17 @@
 //
 // ReverseTime
 //
-
+#pragma mark -
+#pragma mark ReverseTime
 @implementation ReverseTime
-+(id) actionWithAction: (IntervalAction*) action
++(id) actionWithAction: (FiniteTimeAction*) action
 {
-	return [[[super alloc] initWithAction:action] autorelease];
+	// casting to prevent warnings
+	ReverseTime *a = [super alloc];
+	return [[a initWithAction:action] autorelease];
 }
 
--(id) initWithAction: (IntervalAction*) action
+-(id) initWithAction: (FiniteTimeAction*) action
 {
 	if( !(self=[super initWithDuration: [action duration]]) )
 		return nil;
@@ -1025,6 +1039,8 @@
 //
 // Animate
 //
+#pragma mark -
+#pragma mark Animate
 @implementation Animate
 
 +(id) actionWithAnimation: (id<CocosAnimation>)anim

@@ -74,6 +74,10 @@
 {}
 @end
 
+@interface SpriteReverseSequence2 : SpriteDemo
+{}
+@end
+
 @interface SpriteCallFunc : SpriteDemo
 {}
 @end
@@ -86,7 +90,10 @@
 {}
 @end
 
-
 @interface SpriteOrbit : SpriteDemo
+{}
+@end
+
+@interface SpriteBezier : SpriteDemo
 {}
 @end

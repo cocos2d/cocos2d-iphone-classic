@@ -1,6 +1,9 @@
 version 0.7.3 - xx-May-2009
+ . Actions: Sequence works when 1st action, InstantActions are reversible (issue #348)
+ . CocosLive: Demo shows world rankings (issue #342)
  . Director: "new" Fast Director. Attach/Detach, auto-lock, SDK 3.0 works (issue #145, #issue #239, issue #340)
  . Texture2D: supports 16-bit textures RGB4 and RGB5A1 (issue #356)
+ . Support: CGPointExtension compatible with c++ (issue #369)
  
 version 0.7.2 - 23-Apr-2009
  . All: removed chipmunk macros. using CG macros (issue #290)

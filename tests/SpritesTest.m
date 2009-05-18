@@ -19,6 +19,7 @@ static NSString *transitions[] = {
 						 @"SpriteRotate",
 						 @"SpriteScale",
 						 @"SpriteJump",
+						 @"SpriteBezier",
 						 @"SpriteBlink",
 						 @"SpriteFade",
 						 @"SpriteTint",
@@ -28,8 +29,9 @@ static NSString *transitions[] = {
 						 @"SpriteReverse",
 						 @"SpriteDelayTime",
 						 @"SpriteRepeat",
-						 @"SpriteReverseSequence",
 						 @"SpriteCallFunc",
+						 @"SpriteReverseSequence",
+						 @"SpriteReverseSequence2",
 						 @"SpriteOrbit" };
 
 Class nextAction()
@@ -250,6 +252,54 @@ Class restartAction()
 }
 @end
 
+@implementation SpriteBezier
+-(void) onEnter
+{
+	[super onEnter];
+	
+	CGSize s = [[Director sharedDirector] winSize];
+	
+	//
+	// startPosition can be any coordinate, but since the movement
+	// is relative to the Bezier curve, make it (0,0)
+	//
+	
+	// sprite 1
+	ccBezierConfig bezier;
+	bezier.startPosition = ccp(0,0);
+	bezier.controlPoint_1 = ccp(0, s.height/2);
+	bezier.controlPoint_2 = ccp(300, -s.height/2);
+	bezier.endPosition = ccp(300,100);
+	
+	id bezierForward = [BezierBy actionWithDuration:3 bezier:bezier];
+	id bezierBack = [bezierForward reverse];	
+	id seq = [Sequence actions: bezierForward, bezierBack, nil];
+	id rep = [RepeatForever actionWithAction:seq];
+	
+
+	// sprite 2
+	ccBezierConfig bezier2;
+	bezier2.startPosition = ccp(0,0);
+	bezier2.controlPoint_1 = ccp(100, s.height/2);
+	bezier2.controlPoint_2 = ccp(200, -s.height/2);
+	bezier2.endPosition = ccp(300,0);
+	
+	id bezierForward2 = [BezierBy actionWithDuration:3 bezier:bezier2];
+	id bezierBack2 = [bezierForward2 reverse];	
+	id seq2 = [Sequence actions: bezierForward2, bezierBack2, nil];
+	id rep2 = [RepeatForever actionWithAction:seq2];
+	
+	
+	[grossini runAction: rep];
+	[tamara runAction:rep2];
+}
+-(NSString *) title
+{
+	return @"BezierBy";
+}
+@end
+
+
 @implementation SpriteBlink
 -(void) onEnter
 {
@@ -317,9 +367,9 @@ Class restartAction()
 	
 	[tamara setVisible:NO];
 	
-	id animation = [Animation animationWithName:@"dance" delay:0.2f];
+	Animation* animation = [Animation animationWithName:@"dance" delay:0.2f];
 	for( int i=1;i<15;i++)
-		[animation addFrame: [NSString stringWithFormat:@"grossini_dance_%02d.png", i]];
+		[animation addFrameWithFilename: [NSString stringWithFormat:@"grossini_dance_%02d.png", i]];
 	
 	id action = [Animate actionWithAnimation: animation];
 	
@@ -427,6 +477,41 @@ Class restartAction()
 	return @"Reverse a sequence";
 }
 @end
+
+@implementation SpriteReverseSequence2
+-(void) onEnter
+{
+	[super onEnter];
+	
+	// Test:
+	//   Sequence should work both with IntervalAction and InstantActions
+	
+	id move1 = [MoveBy actionWithDuration:1 position:ccp(250,0)];
+	id move2 = [MoveBy actionWithDuration:1 position:ccp(0,50)];
+	id tog1 = [ToggleVisibility action];
+	id tog2 = [ToggleVisibility action];
+	id seq = [Sequence actions: move1, tog1, move2, tog2, [move1 reverse], nil];
+	id action = [Repeat actionWithAction:[Sequence actions: seq, [seq reverse], nil]
+								   times:3];
+				 
+
+	// Test:
+	//   Also test that the reverse of Hide is Show, and vice-versa
+	[grossini runAction:action];
+
+	id move_tamara = [MoveBy actionWithDuration:1 position:ccp(100,0)];
+	id move_tamara2 = [MoveBy actionWithDuration:1 position:ccp(50,0)];
+	id hide = [Hide action];
+	id seq_tamara = [Sequence actions: move_tamara, hide, move_tamara2, nil];
+	id seq_back = [seq_tamara reverse];
+	[tamara runAction: [Sequence actions: seq_tamara, seq_back, nil]];
+}
+-(NSString *) title
+{
+	return @"Reverse sequence 2";
+}
+@end
+
 
 @implementation SpriteRepeat
 -(void) onEnter
