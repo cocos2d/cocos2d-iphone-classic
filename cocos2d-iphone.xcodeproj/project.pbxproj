@@ -3974,8 +3974,8 @@
 				50175B240F33B22300624901 /* cocosLiveDemo */,
 				50F992430F9F183500767ABC /* PerformanceSpriteTest */,
 				50F998EC0F9F277D00767ABC /* PerformanceParticleTest */,
-				5012DD3E0FE299EA00D6DDD1 /* TouchesTest */,
 				50DFC2CC0FF62852007E7827 /* Samples */,
+				5012DD3E0FE299EA00D6DDD1 /* TouchesTest */,
 				317070360E29409E00DD3360 /* AccelViewportTest.h */,
 				317070350E29409E00DD3360 /* AccelViewportTest.m */,
 				504CC3441035BECA0096894C /* ActionManagerTest.h */,
@@ -4784,9 +4784,9 @@
 			productReference = 504225700FC0B39C00B992F7 /* libbox2d.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		504226120FC0B5D500B992F7 /* Box2dTest */ = {
+		504226120FC0B5D500B992F7 /* Box2dAccelTouchTest */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5042262B0FC0B5D500B992F7 /* Build configuration list for PBXNativeTarget "Box2dTest" */;
+			buildConfigurationList = 5042262B0FC0B5D500B992F7 /* Build configuration list for PBXNativeTarget "Box2dAccelTouchTest" */;
 			buildPhases = (
 				504226170FC0B5D500B992F7 /* Resources */,
 				5042261A0FC0B5D500B992F7 /* Sources */,
@@ -4798,7 +4798,7 @@
 				504226130FC0B5D500B992F7 /* PBXTargetDependency */,
 				504226340FC0B67200B992F7 /* PBXTargetDependency */,
 			);
-			name = Box2dTest;
+			name = Box2dAccelTouchTest;
 			productName = ChipmunkDemo;
 			productReference = 5042262E0FC0B5D500B992F7 /* Box2dTest.app */;
 			productType = "com.apple.product-type.application";
@@ -5438,10 +5438,11 @@
 				509B39DE0F31020900F2FB95 /* TouchJSON */,
 				8E6CBEEE0F7A758000D47B3A /* vorbis */,
 				317070410E2940C900DD3360 /* AccelViewportTest */,
+				504CC30C1035BDE90096894C /* ActionManagerTest */,
 				506881F40E95761200F943E5 /* AtlasTest */,
 				501C7C6D0F91EFFF0024A296 /* AtlasSpriteTest */,
 				5048287F0F45AED700A30CEF /* AttachTest */,
-				504226120FC0B5D500B992F7 /* Box2dTest */,
+				504226120FC0B5D500B992F7 /* Box2dAccelTouchTest */,
 				50010EBA103B3DB80059EC2E /* Box2dTestBed */,
 				50B2C5CE0E100EF000AE9530 /* ChipmunkAccelTouchTest */,
 				50B2CE450E129FD900AE9530 /* ChipmunkTest */,
@@ -5474,7 +5475,6 @@
 				50D0E0480FF9232E00098927 /* HelloActionsSample */,
 				50D0E0C70FF930BA00098927 /* HelloEventsSample */,
 				DA5F0EC10FFE96D400C7C82E /* Bug422 */,
-				504CC30C1035BDE90096894C /* ActionManagerTest */,
 			);
 		};
 /* End PBXProject section */
@@ -7998,7 +7998,7 @@
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/UIKit.framework/Headers/UIKit.h";
 				GCC_PREPROCESSOR_DEFINITIONS = "COCOS2D_DEBUG=1";
 				GCC_THUMB_SUPPORT = NO;
-				INFOPLIST_FILE = "/Users/riq/progs/cocos2d-iphone/trunk/Resources/Info copy.plist";
+				INFOPLIST_FILE = Resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -8008,7 +8008,7 @@
 					UIKit,
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = ParallaxTest;
+				PRODUCT_NAME = ActionManagerTest;
 				SDKROOT = iphoneos2.0;
 			};
 			name = Debug;
@@ -9767,7 +9767,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5042262B0FC0B5D500B992F7 /* Build configuration list for PBXNativeTarget "Box2dTest" */ = {
+		5042262B0FC0B5D500B992F7 /* Build configuration list for PBXNativeTarget "Box2dAccelTouchTest" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5042262C0FC0B5D500B992F7 /* Debug */,
