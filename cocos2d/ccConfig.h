@@ -25,11 +25,18 @@
 #define CC_FONT_LABEL_SUPPORT	1
 
 /**
- If enabled, the the FPS will be drawn using LabelAtlas (fast rendering).
+ If enabled, the the FPS will be drawn using CCLabelAtlas (fast rendering).
  You will need to add the fps_images.png to your project.
  If disabled, the FPS will be rendered using Label (slow rendering)
  */
 #define CC_DIRECTOR_FAST_FPS	1
+
+/**
+ Senconds between FPS updates.
+ 0.5 seconds, means that the FPS number will be updated every 0.5 seconds.
+ Having a bigger number means a more reliable FPS
+ */
+#define CC_DIRECTOR_FPS_INTERVAL (0.1f)
 
 /**
  If enabled, and only when it is used with FastDirector, the main loop will wait 0.04 seconds to
@@ -59,11 +66,18 @@
 #define CC_TEXTURE_ATLAS_USES_VBO 1
 
 /**
- If enabled, all subclasses of TextureNode will draw a bounding box
+ If enabled, all subclasses of CCSprite will draw a bounding box
  Useful for debugging purposes only.
  It is recommened to leave it disabled.
  */
-//#define CC_TEXTURENODE_DEBUG_DRAW 1
+//#define CC_SPRITE_DEBUG_DRAW 1
+
+/**
+ If enabled, all subclasses of CCSprite that are rendered using an CCSpriteSheet draw a bounding box.
+ Useful for debugging purposes only.
+ It is recommened to leave it disabled.
+ */
+//#define CC_SPRITESHEET_DEBUG_DRAW 1
 
 /**
  If enabled, all subclasses of BitmapFontAtlas will draw a bounding box
@@ -79,12 +93,6 @@
  */
 //#define CC_LABELATLAS_DEBUG_DRAW 1
 
-/**
- If enabled, all subclasses of CCSpriteSheet will draw a bounding box
- Useful for debugging purposes only.
- It is recommened to leave it disabled.
- */
-//#define CC_SPRITESHEET_DEBUG_DRAW 1
 
 /**
  If enabled, CCNode will transform the nodes using a cached Affine matrix.

@@ -691,7 +691,7 @@ static CCDirector *_sharedDirector = nil;
 
 		// issue #709. the root node (scene) should receive the cleanup message too
 		// otherwise it might be leaked.
-		[runningScene_ cleanup];		
+		[runningScene_ cleanup];
 	}
 
 	[runningScene_ release];
@@ -756,7 +756,7 @@ static CCDirector *_sharedDirector = nil;
 	frames++;
 	accumDt += dt;
 	
-	if ( accumDt > 0.1f)  {
+	if ( accumDt > CC_DIRECTOR_FPS_INTERVAL)  {
 		frameRate = frames/accumDt;
 		frames = 0;
 		accumDt = 0;
@@ -779,7 +779,7 @@ static CCDirector *_sharedDirector = nil;
 	frames++;
 	accumDt += dt;
 	
-	if ( accumDt > 0.3f)  {
+	if ( accumDt > CC_DIRECTOR_FPS_INTERVAL)  {
 		frameRate = frames/accumDt;
 		frames = 0;
 		accumDt = 0;
