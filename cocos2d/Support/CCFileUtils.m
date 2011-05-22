@@ -100,45 +100,36 @@ NSString *ccRemoveHDSuffixFromFile( NSString *path )
 
 +(NSString*) getDoubleResolutionImage:(NSString*)path
 {
-#if CC_IS_RETINA_DISPLAY_SUPPORTED
+    NSString *pathWithoutExtension = [path stringByDeletingPathExtension];
+    NSString *name = [pathWithoutExtension lastPathComponent];
+    
+    // check if path already has the suffix.
+    if( [name rangeOfString:CC_RETINA_DISPLAY_FILENAME_SUFFIX].location != NSNotFound ) {
+    
+        CCLOG(@"cocos2d: WARNING Filename(%@) already has the suffix %@. Using it.", name, CC_RETINA_DISPLAY_FILENAME_SUFFIX);			
+        return path;
+    }
 
-	if( CC_CONTENT_SCALE_FACTOR() == 2 )
-	{
-		
-		NSString *pathWithoutExtension = [path stringByDeletingPathExtension];
-		NSString *name = [pathWithoutExtension lastPathComponent];
-		
-		// check if path already has the suffix.
-		if( [name rangeOfString:CC_RETINA_DISPLAY_FILENAME_SUFFIX].location != NSNotFound ) {
-		
-			CCLOG(@"cocos2d: WARNING Filename(%@) already has the suffix %@. Using it.", name, CC_RETINA_DISPLAY_FILENAME_SUFFIX);			
-			return path;
-		}
+    
+    NSString *extension = [path pathExtension];
+    
+    if( [extension isEqualToString:@"ccz"] || [extension isEqualToString:@"gz"] )
+    {
+        // All ccz / gz files should be in the format filename.xxx.ccz
+        // so we need to pull off the .xxx part of the extension as well
+        extension = [NSString stringWithFormat:@"%@.%@", [pathWithoutExtension pathExtension], extension];
+        pathWithoutExtension = [pathWithoutExtension stringByDeletingPathExtension];
+    }
+    
+    
+    NSString *retinaName = [pathWithoutExtension stringByAppendingString:CC_RETINA_DISPLAY_FILENAME_SUFFIX];
+    retinaName = [retinaName stringByAppendingPathExtension:extension];
 
-		
-		NSString *extension = [path pathExtension];
-		
-		if( [extension isEqualToString:@"ccz"] || [extension isEqualToString:@"gz"] )
-		{
-			// All ccz / gz files should be in the format filename.xxx.ccz
-			// so we need to pull off the .xxx part of the extension as well
-			extension = [NSString stringWithFormat:@"%@.%@", [pathWithoutExtension pathExtension], extension];
-			pathWithoutExtension = [pathWithoutExtension stringByDeletingPathExtension];
-		}
-		
-		
-		NSString *retinaName = [pathWithoutExtension stringByAppendingString:CC_RETINA_DISPLAY_FILENAME_SUFFIX];
-		retinaName = [retinaName stringByAppendingPathExtension:extension];
+    if( [__localFileManager fileExistsAtPath:retinaName] )
+        return retinaName;
 
-		if( [__localFileManager fileExistsAtPath:retinaName] )
-			return retinaName;
-
-		CCLOG(@"cocos2d: CCFileUtils: Warning HD file not found: %@", [retinaName lastPathComponent] );
-	}
-	
-#endif // CC_IS_RETINA_DISPLAY_SUPPORTED
-	
-	return path;
+    CCLOG(@"cocos2d: CCFileUtils: Warning HD file not found: %@", [retinaName lastPathComponent] );
+	return nil;
 }
 
 +(NSString*) fullPathFromRelativePath:(NSString*) relPath
@@ -160,8 +151,6 @@ NSString *ccRemoveHDSuffixFromFile( NSString *path )
 	
 	if (fullpath == nil)
 		fullpath = relPath;
-	
-	fullpath = [self getDoubleResolutionImage:fullpath];
 	
 	return fullpath;	
 }
