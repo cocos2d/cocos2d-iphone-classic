@@ -176,7 +176,7 @@ static CCDirector *_sharedDirector = nil;
 	NSAssert( openGLView_, @"openGLView_ must be initialized");
 
 	[self setAlphaBlending: YES];
-	[self setDepthTest: YES];
+	[self setDepthTest: openGLView_.depthFormat];
 	[self setProjection: projection_];
 	
 	// set other opengl default values
