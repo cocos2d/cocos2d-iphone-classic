@@ -722,19 +722,28 @@ static BOOL configured = FALSE;
 }
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_4_0 && __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_6_0
+
 -(void) endInterruptionWithFlags:(NSUInteger)flags {
 	CDLOGINFO(@"Denshion::CDAudioManager - interruption ended with flags %i",flags);
 	if (flags == AVAudioSessionInterruptionFlags_ShouldResume) {
 		[self audioSessionResumed];
 	}
 }
+-(void) endInterruptionWithOptions:(AVAudioSessionInterruptionOptions)options {
+    NSAssert(NO, @"Versioning mismatch");
+}
+
 #elif defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_6_0
+-(void) endInterruptionWithFlags:(NSUInteger)flags {
+    NSAssert(NO, @"Versioning mismatch");
+}
 -(void) endInterruptionWithOptions:(AVAudioSessionInterruptionOptions)options {
     CDLOGINFO(@"Denshion::CDAudioManager - interruption ended with options %i",options);
     if (options == AVAudioSessionInterruptionOptionShouldResume) {
         [self audioSessionResumed];
     }
 }
+
 #endif
 
 -(void)audioSessionInterrupted
