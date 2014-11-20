@@ -502,7 +502,7 @@ GLToClipTransform(kmMat4 *transformOut)
 
 -(void)getFPSImageData:(unsigned char**)datapointer length:(NSUInteger*)len
 {
-	int device = [[CCConfiguration sharedConfiguration] runningDevice];
+	NSInteger device = [[CCConfiguration sharedConfiguration] runningDevice];
 
 	if( device == kCCDeviceiPadRetinaDisplay) {
 		*datapointer = cc_fps_images_ipadhd_png;

@@ -46,12 +46,12 @@
 @synthesize delegate=_delegate, priority=_priority;
 @synthesize enabledSelectors=_enabledSelectors;
 
-+ (id)handlerWithDelegate:(id) aDelegate priority:(int)aPriority
++ (id)handlerWithDelegate:(id) aDelegate priority:(NSInteger)aPriority
 {
 	return [[[self alloc] initWithDelegate:aDelegate priority:aPriority] autorelease];
 }
 
-- (id)initWithDelegate:(id) aDelegate priority:(int)aPriority
+- (id)initWithDelegate:(id) aDelegate priority:(NSInteger)aPriority
 {
 	NSAssert(aDelegate != nil, @"Touch delegate may not be nil");
 
@@ -74,7 +74,7 @@
 #pragma mark -
 #pragma mark StandardTouchHandler
 @implementation CCStandardTouchHandler
--(id) initWithDelegate:(id)del priority:(int)pri
+-(id) initWithDelegate:(id)del priority:(NSInteger)pri
 {
 	if( (self=[super initWithDelegate:del priority:pri]) ) {
 		if( [del respondsToSelector:@selector(ccTouchesBegan:withEvent:)] )
@@ -101,12 +101,12 @@
 
 @synthesize swallowsTouches=_swallowsTouches, claimedTouches=_claimedTouches;
 
-+ (id)handlerWithDelegate:(id)aDelegate priority:(int)priority swallowsTouches:(BOOL)swallow
++ (id)handlerWithDelegate:(id)aDelegate priority:(NSInteger)priority swallowsTouches:(BOOL)swallow
 {
 	return [[[self alloc] initWithDelegate:aDelegate priority:priority swallowsTouches:swallow] autorelease];
 }
 
-- (id)initWithDelegate:(id)aDelegate priority:(int)aPriority swallowsTouches:(BOOL)swallow
+- (id)initWithDelegate:(id)aDelegate priority:(NSInteger)aPriority swallowsTouches:(BOOL)swallow
 {
 	if ((self = [super initWithDelegate:aDelegate priority:aPriority])) {
 		_claimedTouches = [[NSMutableSet alloc] initWithCapacity:2];
