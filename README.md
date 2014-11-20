@@ -8,7 +8,7 @@ Update 20. November 2014
 The core library has been updated to 64 bit, plus whatever it takes to run on XCode 6.
 This version replaces V2.1 file by file.
 To install, download zip, and replace the entire $project/libs/cocos2d folder.
-Disclaimer:
+**Disclaimer:**  
 By overwriting, any user changes to the 2.1 API, will of course be lost.
 
 Deprecation has not been removed. This will mainly be accelerometer and modalViewController.
