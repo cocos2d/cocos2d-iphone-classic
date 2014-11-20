@@ -1,4 +1,4 @@
-<img src="http://www.cocos2d-iphone.org/downloads/cocos2d_logo.png">
+<img src="http://www.cocos2d-swift.org/downloads/cocos2d_logo.png">
 
 cocos2d for iPhone
 ==================
