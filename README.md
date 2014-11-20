@@ -13,7 +13,7 @@ By overwriting, any user changes to the 2.1 API, will of course be lost.
 
 Deprecation has not been removed. This will mainly be accelerometer and modalViewController.
 
-
+====================
 
 [cocos2d for iPhone][1] is a framework for building 2D games, demos, and other
 graphical/interactive applications for iPod Touch, iPhone, iPad and Mac OS X.
