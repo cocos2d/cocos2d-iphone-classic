@@ -21,6 +21,7 @@
 
 #import "CCPhysicsSprite.h"
 #import "Support/CGPointExtension.h"
+#import "ccConfig.h"
 
 #if CC_ENABLE_CHIPMUNK_INTEGRATION
 #import "chipmunk.h"
