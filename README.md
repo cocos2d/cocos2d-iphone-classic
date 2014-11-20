@@ -1,7 +1,23 @@
-<img src="http://www.cocos2d-iphone.org/downloads/cocos2d_logo.png">
+<img src="https://github.com/cocos2d/cocos2d-iphone-classic/blob/v2.2/Resources/Icon%402x.png">
 
 cocos2d for iPhone
 ==================
+
+Update 20. November 2014
+
+The core library has been updated to 64 bit, plus whatever it takes to run on XCode 6.  
+This version replaces V2.1 file by file.  
+To install, download zip, and replace the entire $project/libs/cocos2d folder.  
+**Disclaimer:**  
+By replacing all cocos2d files, any user changes to the original 2.1 API, will of course be lost.
+
+
+There are no warnings or analyzer remarks left, that has anything to do with 64 bit.  
+We have checked (as good as we could) that there is no int to pointer conversions which can break.
+
+Deprecation has not been removed. This will mainly be accelerometer and modalViewController.
+
+====================
 
 [cocos2d for iPhone][1] is a framework for building 2D games, demos, and other
 graphical/interactive applications for iPod Touch, iPhone, iPad and Mac OS X.
