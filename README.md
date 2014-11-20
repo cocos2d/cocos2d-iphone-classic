@@ -11,6 +11,10 @@ To install, download zip, and replace the entire $project/libs/cocos2d folder.
 **Disclaimer:**  
 By replacing all cocos2d files, any user changes to the original 2.1 API, will of course be lost.
 
+
+There are no warnings or analyzer remarks left, that has anything to do with 64 bit.  
+We have checked (as good as we could) that there is no int to pointer conversions which can break.
+
 Deprecation has not been removed. This will mainly be accelerometer and modalViewController.
 
 ====================
