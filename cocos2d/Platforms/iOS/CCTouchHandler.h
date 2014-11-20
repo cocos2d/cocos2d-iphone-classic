@@ -44,14 +44,14 @@
 */
 @interface CCTouchHandler : NSObject {
 	id				_delegate;
-	int				_priority;
+	NSInteger				_priority;
 	ccTouchSelectorFlag		_enabledSelectors;
 }
 
 /** delegate */
 @property(nonatomic, readwrite, retain) id delegate;
 /** priority */
-@property(nonatomic, readwrite) int priority; // default 0
+@property(nonatomic, readwrite) NSInteger priority; // default 0
 /** enabled selectors */
 @property(nonatomic,readwrite) ccTouchSelectorFlag enabledSelectors;
 

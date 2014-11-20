@@ -98,12 +98,12 @@ struct ccTouchHandlerHelperData {
  See StandardTouchDelegate description.
  IMPORTANT: The delegate will be retained.
  */
--(void) addStandardDelegate:(id<CCTouchAllAtOnceDelegate>) delegate priority:(int)priority;
+-(void) addStandardDelegate:(id<CCTouchAllAtOnceDelegate>) delegate priority:(NSInteger)priority;
 /** Adds a targeted touch delegate to the dispatcher's list.
  See TargetedTouchDelegate description.
  IMPORTANT: The delegate will be retained.
  */
--(void) addTargetedDelegate:(id<CCTouchOneByOneDelegate>) delegate priority:(int)priority swallowsTouches:(BOOL)swallowsTouches;
+-(void) addTargetedDelegate:(id<CCTouchOneByOneDelegate>) delegate priority:(NSInteger)priority swallowsTouches:(BOOL)swallowsTouches;
 /** Removes a touch delegate.
  The delegate will be released
  */
@@ -112,7 +112,7 @@ struct ccTouchHandlerHelperData {
 -(void) removeAllDelegates;
 /** Changes the priority of a previously added delegate. The lower the number,
  the higher the priority */
--(void) setPriority:(int) priority forDelegate:(id) delegate;
+-(void) setPriority:(NSInteger) priority forDelegate:(id) delegate;
 
 NSComparisonResult sortByPriority(id first, id second, void *context);
 @end

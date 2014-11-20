@@ -119,7 +119,7 @@
 	[array insertObject:handler atIndex:i];
 }
 
--(void) addStandardDelegate:(id<CCTouchAllAtOnceDelegate>) delegate priority:(int)priority
+-(void) addStandardDelegate:(id<CCTouchAllAtOnceDelegate>) delegate priority:(NSInteger)priority
 {
 	CCTouchHandler *handler = [CCStandardTouchHandler handlerWithDelegate:delegate priority:priority];
 	if( ! locked ) {
@@ -132,7 +132,7 @@
 	}
 }
 
--(void) addTargetedDelegate:(id<CCTouchOneByOneDelegate>) delegate priority:(int)priority swallowsTouches:(BOOL)swallowsTouches
+-(void) addTargetedDelegate:(id<CCTouchOneByOneDelegate>) delegate priority:(NSInteger)priority swallowsTouches:(BOOL)swallowsTouches
 {
 	CCTouchHandler *handler = [CCTargetedTouchHandler handlerWithDelegate:delegate priority:priority swallowsTouches:swallowsTouches];
 	if( ! locked ) {
@@ -238,7 +238,7 @@ NSComparisonResult sortByPriority(id first, id second, void *context)
     [array sortUsingFunction:sortByPriority context:nil];
 }
 
--(void) setPriority:(int) priority forDelegate:(id) delegate
+-(void) setPriority:(NSInteger) priority forDelegate:(id) delegate
 {
 	NSAssert(delegate != nil, @"Got nil touch delegate!");
 
@@ -264,8 +264,8 @@ NSComparisonResult sortByPriority(id first, id second, void *context)
 	locked = YES;
 
 	// optimization to prevent a mutable copy when it is not necessary
-	unsigned int targetedHandlersCount = [targetedHandlers count];
-	unsigned int standardHandlersCount = [standardHandlers count];
+	NSUInteger targetedHandlersCount = [targetedHandlers count];
+	NSUInteger standardHandlersCount = [standardHandlers count];
 	BOOL needsMutableSet = (targetedHandlersCount && standardHandlersCount);
 
 	mutableTouches = (needsMutableSet ? [touches mutableCopy] : touches);
