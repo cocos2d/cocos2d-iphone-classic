@@ -60,11 +60,11 @@ void* CDloadWaveAudioData(CFURLRef inFileURL, ALsizei *outDataSize, ALenum *outD
 
 	// Open a file with ExtAudioFileOpen()
 	err = AudioFileOpenURL(inFileURL, kAudioFileReadPermission, 0, &afid);
-	if(err) { CDLOG(@"MyGetOpenALAudioData: AudioFileOpenURL FAILED, Error = %ld\n", err); goto Exit; }
+	if(err) { CDLOG(@"MyGetOpenALAudioData: AudioFileOpenURL FAILED, Error = %d\n", (int)err); goto Exit; }
 
 	// Get the audio data format
 	err = AudioFileGetProperty(afid, kAudioFilePropertyDataFormat, &thePropertySize, &theFileFormat);
-	if(err) { CDLOG(@"MyGetOpenALAudioData: AudioFileGetProperty(kAudioFileProperty_DataFormat) FAILED, Error = %ld\n", err); goto Exit; }
+	if(err) { CDLOG(@"MyGetOpenALAudioData: AudioFileGetProperty(kAudioFileProperty_DataFormat) FAILED, Error = %d\n", (int)err); goto Exit; }
 
 	if (theFileFormat.mChannelsPerFrame > 2)  {
 		CDLOG(@"MyGetOpenALAudioData - Unsupported Format, channel count is greater than stereo\n"); goto Exit;
@@ -81,7 +81,7 @@ void* CDloadWaveAudioData(CFURLRef inFileURL, ALsizei *outDataSize, ALenum *outD
 
 	thePropertySize = sizeof(fileDataSize);
 	err = AudioFileGetProperty(afid, kAudioFilePropertyAudioDataByteCount, &thePropertySize, &fileDataSize);
-	if(err) { CDLOG(@"MyGetOpenALAudioData: AudioFileGetProperty(kAudioFilePropertyAudioDataByteCount) FAILED, Error = %ld\n", err); goto Exit; }
+	if(err) { CDLOG(@"MyGetOpenALAudioData: AudioFileGetProperty(kAudioFilePropertyAudioDataByteCount) FAILED, Error = %d\n", (int)err); goto Exit; }
 
 	// Read all the data into memory
 	UInt32		dataSize = (UInt32)fileDataSize;
@@ -108,7 +108,7 @@ void* CDloadWaveAudioData(CFURLRef inFileURL, ALsizei *outDataSize, ALenum *outD
 			// failure
 			free (theData);
 			theData = NULL; // make sure to return NULL
-			CDLOG(@"MyGetOpenALAudioData: ExtAudioFileRead FAILED, Error = %ld\n", err); goto Exit;
+			CDLOG(@"MyGetOpenALAudioData: ExtAudioFileRead FAILED, Error = %d\n", (int)err); goto Exit;
 		}
 	}
 
@@ -135,7 +135,7 @@ void* CDloadCafAudioData(CFURLRef inFileURL, ALsizei *outDataSize, ALenum *outDa
 	status = ExtAudioFileOpenURL(inFileURL, &extRef);
 	if (status != noErr)
 	{
-		CDLOG(@"MyGetOpenALAudioData: ExtAudioFileOpenURL FAILED, Error = %ld\n", status);
+		CDLOG(@"MyGetOpenALAudioData: ExtAudioFileOpenURL FAILED, Error = %d\n", (int)status);
 		abort = YES;
 	}
 	if (abort)
@@ -145,7 +145,7 @@ void* CDloadCafAudioData(CFURLRef inFileURL, ALsizei *outDataSize, ALenum *outDa
 	status = ExtAudioFileGetProperty(extRef, kExtAudioFileProperty_FileDataFormat, &thePropertySize, &theFileFormat);
 	if (status != noErr)
 	{
-		CDLOG(@"MyGetOpenALAudioData: ExtAudioFileGetProperty(kExtAudioFileProperty_FileDataFormat) FAILED, Error = %ld\n", status);
+		CDLOG(@"MyGetOpenALAudioData: ExtAudioFileGetProperty(kExtAudioFileProperty_FileDataFormat) FAILED, Error = %d\n", (int)status);
 		abort = YES;
 	}
 	if (abort)
@@ -175,7 +175,7 @@ void* CDloadCafAudioData(CFURLRef inFileURL, ALsizei *outDataSize, ALenum *outDa
 	status = ExtAudioFileSetProperty(extRef, kExtAudioFileProperty_ClientDataFormat, sizeof(theOutputFormat), &theOutputFormat);
 	if (status != noErr)
 	{
-		CDLOG(@"MyGetOpenALAudioData: ExtAudioFileSetProperty(kExtAudioFileProperty_ClientDataFormat) FAILED, Error = %ld\n", status);
+		CDLOG(@"MyGetOpenALAudioData: ExtAudioFileSetProperty(kExtAudioFileProperty_ClientDataFormat) FAILED, Error = %d\n", (int)status);
 		abort = YES;
 	}
 	if (abort)
@@ -186,7 +186,7 @@ void* CDloadCafAudioData(CFURLRef inFileURL, ALsizei *outDataSize, ALenum *outDa
 	status = ExtAudioFileGetProperty(extRef, kExtAudioFileProperty_FileLengthFrames, &thePropertySize, &theFileLengthInFrames);
 	if (status != noErr)
 	{
-		CDLOG(@"MyGetOpenALAudioData: ExtAudioFileGetProperty(kExtAudioFileProperty_FileLengthFrames) FAILED, Error = %ld\n", status);
+		CDLOG(@"MyGetOpenALAudioData: ExtAudioFileGetProperty(kExtAudioFileProperty_FileLengthFrames) FAILED, Error = %d\n", (int)status);
 		abort = YES;
 	}
 	if (abort)
@@ -219,7 +219,7 @@ void* CDloadCafAudioData(CFURLRef inFileURL, ALsizei *outDataSize, ALenum *outDa
 			// failure
 			free (theData);
 			theData = NULL; // make sure to return NULL
-			CDLOG(@"MyGetOpenALAudioData: ExtAudioFileRead FAILED, Error = %ld\n", status);
+			CDLOG(@"MyGetOpenALAudioData: ExtAudioFileRead FAILED, Error = %d\n", (int)status);
 			abort = YES;
 		}
 	}
