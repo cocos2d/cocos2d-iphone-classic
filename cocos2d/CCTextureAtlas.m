@@ -140,6 +140,7 @@
 
 #if CC_TEXTURE_ATLAS_USE_VAO
 	glDeleteVertexArrays(1, &_VAOname);
+	ccGLBindVAO(0);
 #endif
 
 	[_texture release];

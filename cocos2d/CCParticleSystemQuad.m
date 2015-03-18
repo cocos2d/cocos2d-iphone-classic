@@ -162,6 +162,7 @@
 		// clean VAO
 		glDeleteBuffers(2, &_buffersVBO[0]);
 		glDeleteVertexArrays(1, &_VAOname);
+		ccGLBindVAO(0);
 
         [self initVAO];
     }
@@ -227,6 +228,7 @@
 
 		glDeleteBuffers(2, &_buffersVBO[0]);
 		glDeleteVertexArrays(1, &_VAOname);
+		ccGLBindVAO(0);
 	}
 
 	[super dealloc];
@@ -489,6 +491,7 @@
 
 			glDeleteBuffers(2, &_buffersVBO[0]);
 			glDeleteVertexArrays(1, &_VAOname);
+			ccGLBindVAO(0);
 		}
 	}
 }
