@@ -316,7 +316,7 @@ static CCTexture2DPixelFormat defaultAlphaPixel_format = kCCTexture2DPixelFormat
 			
 			NSUInteger neededBytes = (4 - mod ) / (bpp/8);
 
-			CCLOGWARN(@"cocos2d: WARNING converting size=(%d,%d) to size=(%d,%d) due to iOS 5.x memory BUG. See: http://www.cocos2d-iphone.org/forum/topic/31092", textureWidth, textureHeight, textureWidth + neededBytes, textureHeight );
+			CCLOGWARN(@"cocos2d: WARNING converting size=(%lu,%lu) to size=(%lu,%lu) due to iOS 5.x memory BUG. See: http://www.cocos2d-iphone.org/forum/topic/31092", (unsigned long)textureWidth, (unsigned long)textureHeight, (unsigned long)(textureWidth + neededBytes), (unsigned long)textureHeight );
 			textureWidth = textureWidth + neededBytes;
 		}
 	}   
@@ -524,8 +524,8 @@ static CCTexture2DPixelFormat defaultAlphaPixel_format = kCCTexture2DPixelFormat
     
     if ( [definition shadowEnabled] )
     {
-        shadowStrokePaddingX = max(shadowStrokePaddingX, (float)abs([definition shadowOffset].width));
-        shadowStrokePaddingY = max(shadowStrokePaddingY, (float)abs([definition shadowOffset].height));
+        shadowStrokePaddingX = max(shadowStrokePaddingX, (float)fabs([definition shadowOffset].width));
+        shadowStrokePaddingY = max(shadowStrokePaddingY, (float)fabs([definition shadowOffset].height));
     }
     
     // add the padding (this could be 0 if no shadow and no stroke)
@@ -565,7 +565,6 @@ static CCTexture2DPixelFormat defaultAlphaPixel_format = kCCTexture2DPixelFormat
         CGContextSetGrayFillColor(context, 1.0f, 1.0f);
     }
 
-	
 	CGColorSpaceRelease(colorSpace);
 	
 	if( ! context ) {
@@ -632,8 +631,26 @@ static CCTexture2DPixelFormat defaultAlphaPixel_format = kCCTexture2DPixelFormat
 	// must follow the same order of CCTextureAligment
 	NSUInteger alignments[] = { NSTextAlignmentLeft, NSTextAlignmentCenter, NSTextAlignmentRight };
 	
-	[string drawInRect:drawArea withFont:uifont lineBreakMode:linebreaks[definition.lineBreakMode] alignment:alignments[definition.alignment]];
-    
+    if ([CCConfiguration sharedConfiguration].OSVersion >= kCCiOSVersion_6_0_0) {
+        NSMutableParagraphStyle* paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        paragraphStyle.lineBreakMode = linebreaks[definition.lineBreakMode];
+        paragraphStyle.alignment = alignments[definition.alignment];
+        UIColor* color = [UIColor colorWithRed:definition.fontFillColor.r/255.0 green:definition.fontFillColor.g/255.0 blue:definition.fontFillColor.b/255.0 alpha:1.0];
+        UIColor* strokeColor = [UIColor colorWithRed:definition.strokeColor.r/255.0 green:definition.strokeColor.g/255.0 blue:definition.strokeColor.b/255.0 alpha:1.0];
+        
+        id dict = @{NSFontAttributeName: uifont,
+                    NSParagraphStyleAttributeName: paragraphStyle,
+                    NSForegroundColorAttributeName:color,
+                    NSStrokeColorAttributeName:strokeColor,
+                    // to get an actual stroke, it needs to be negative or the fill won't work, and it is a percentage of the font size.
+                    NSStrokeWidthAttributeName:[NSNumber numberWithFloat:-definition.strokeSize*(100.0f/uifont.pointSize)]};
+        
+        [string drawInRect:drawArea withAttributes:dict];
+    }
+    else {
+        [string drawInRect:drawArea withFont:uifont lineBreakMode:linebreaks[definition.lineBreakMode] alignment:alignments[definition.alignment]];
+    }
+
 
 	UIGraphicsPopContext();
 	
@@ -647,9 +664,9 @@ static CCTexture2DPixelFormat defaultAlphaPixel_format = kCCTexture2DPixelFormat
 	else
 	{
 	#if CC_USE_LA88_LABELS
-		NSUInteger textureSize = textureWidth*textureHeight;
+		NSInteger textureSize = textureWidth*textureHeight;
 		unsigned short *la88_data = (unsigned short*)data;
-		for(int i = textureSize-1; i>=0; i--) //Convert A8 to AI88
+		for(NSInteger i = textureSize-1; i>=0; i--) //Convert A8 to AI88
 		la88_data[i] = (data[i] << 8) | 0xff;
 	#endif
 		 self = [self initWithData:data pixelFormat:LABEL_PIXEL_FORMAT pixelsWide:textureWidth pixelsHigh:textureHeight contentSize:computedDimension];
@@ -720,14 +737,24 @@ static CCTexture2DPixelFormat defaultAlphaPixel_format = kCCTexture2DPixelFormat
 	// must follow the same order of CCTextureAligment
 	NSUInteger alignments[] = { NSTextAlignmentLeft, NSTextAlignmentCenter, NSTextAlignmentRight };
 	
-	[string drawInRect:drawArea withFont:uifont lineBreakMode:linebreaks[lineBreakMode] alignment:alignments[hAlignment]];
+    if ([CCConfiguration sharedConfiguration].OSVersion >= kCCiOSVersion_6_0_0) {
+        NSMutableParagraphStyle* paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+        paragraphStyle.lineBreakMode = linebreaks[lineBreakMode];
+        paragraphStyle.alignment = alignments[hAlignment];
+        UIColor* color = [UIColor whiteColor];
+        id dict = @{NSFontAttributeName: uifont, NSParagraphStyleAttributeName: paragraphStyle,NSForegroundColorAttributeName:color};
+        [string drawInRect:drawArea withAttributes:dict];
+    }
+    else {
+        [string drawInRect:drawArea withFont:uifont lineBreakMode:linebreaks[lineBreakMode] alignment:alignments[hAlignment]];
+    }
 
 	UIGraphicsPopContext();
 
 #if CC_USE_LA88_LABELS
-	NSUInteger textureSize = textureWidth*textureHeight;
+	NSInteger textureSize = textureWidth*textureHeight;
 	unsigned short *la88_data = (unsigned short*)data;
-	for(int i = textureSize-1; i>=0; i--) //Convert A8 to AI88
+	for(NSInteger i = textureSize-1; i>=0; i--) //Convert A8 to AI88
 		la88_data[i] = (data[i] << 8) | 0xff;
 
 #endif
