@@ -36,6 +36,8 @@ extern NSString const *kCCFileUtilsiPhone;
 extern NSString const *kCCFileUtilsiPhoneHD;
 extern NSString const *kCCFileUtilsiPhone5;
 extern NSString const *kCCFileUtilsiPhone5HD;
+extern NSString const *kCCFileUtilsiPhone6;
+extern NSString const *kCCFileUtilsiPhoneRetinaHD;
 extern NSString const *kCCFileUtilsMac;
 extern NSString const *kCCFileUtilsMacHD;
 
@@ -52,19 +54,19 @@ enum {
 {
 	NSFileManager		*_fileManager;
 	NSBundle			*_bundle;
-
+    
 	NSMutableDictionary *_fullPathCache;
 	NSMutableDictionary *_fullPathNoResolutionsCache;
 	NSMutableDictionary *_removeSuffixCache;
-	
+    
 	NSMutableDictionary	*_directoriesDict;
 	NSMutableDictionary	*_suffixesDict;
-	
+
 	NSMutableDictionary	*_filenameLookup;
-	
+
 	NSMutableArray		*_searchResolutionsOrder;
 	NSMutableArray		*_searchPath;
-	
+
 	// it could be suffix (default) or directory
 	int					_searchMode;
 	
@@ -102,12 +104,12 @@ enum {
  - iPad HD: "resources-ipadhd"
  - Mac: "resources-mac"
  - Mac HD: "resources-machd"
- 
+
  If "search in directories" is enabled (disabled by default), it will try to get the resources from the directories according to the order of "searchResolutionsOrder" array.
  @since v2.1
  */
 @property (nonatomic, copy) NSMutableDictionary *directoriesDict;
-
+ 
 /** Dictionary that contians the suffix for the different devices. Default values:
 	- iPhone: ""
 	- iPhone HD: "-hd"
@@ -198,7 +200,7 @@ enum {
 -(void)setiPadRetinaDisplaySuffix:(NSString*)iPadRetinaDisplaySuffix;
 
 #endif // __CC_PLATFORM_IOS
-
+ 
 
 /** returns the shared file utils instance */
 +(CCFileUtils*) sharedFileUtils;
@@ -216,27 +218,27 @@ enum {
 - (void) buildSearchResolutionsOrder;
 
 /** Returns the fullpath of an filename.
-
+ 
  If in iPhoneRetinaDisplay mode, and a RetinaDisplay file is found, it will return that path.
  If in iPad mode, and an iPad file is found, it will return that path.
  
  If the filename can't be found, it will return "relPath" instead of nil.
 
  Examples:
-
-  * In iPad mode: "image.png" -> "/full/path/image-ipad.png" (in case the -ipad file exists)
-  * In iPhone RetinaDisplay mode: "image.png" -> "/full/path/image-hd.png" (in case the -hd file exists)
-  * In iPad RetinaDisplay mode: "image.png" -> "/full/path/image-ipadhd.png" (in case the -ipadhd file exists)
-
+ 
+ * In iPad mode: "image.png" -> "/full/path/image-ipad.png" (in case the -ipad file exists)
+ * In iPhone RetinaDisplay mode: "image.png" -> "/full/path/image-hd.png" (in case the -hd file exists)
+ * In iPad RetinaDisplay mode: "image.png" -> "/full/path/image-ipadhd.png" (in case the -ipadhd file exists)
+ 
  */
 -(NSString*) fullPathFromRelativePath:(NSString*) relPath;
 
 /** Returns the fullpath of an filename. It will try to get the correct file for the current screen resolution.
  Useful for loading images and other assets that are related for the screen resolution.
- 
+
  If in iPad mode, and an iPad file is found, it will return that path.
  If in iPhoneRetinaDisplay mode, and a RetinaDisplay file is found, it will return that path. But if it is not found, it will try load an iPhone Non-RetinaDisplay  file.
-
+ 
  If the filename can't be found, it will return "relPath" instead of nil.
 
  Examples:
@@ -380,15 +382,15 @@ enum {
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/** loads a file into memory.
- the caller should release the allocated buffer.
-
- @returns the size of the allocated buffer
- @since v0.99.5
- */
-NSInteger ccLoadFileIntoMemory(const char *filename, unsigned char **out);
-	
+    
+    /** loads a file into memory.
+     the caller should release the allocated buffer.
+     
+     @returns the size of the allocated buffer
+     @since v0.99.5
+     */
+    NSInteger ccLoadFileIntoMemory(const char *filename, unsigned char **out);
+    
 #ifdef __cplusplus
 }
 #endif
