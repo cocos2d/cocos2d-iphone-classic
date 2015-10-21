@@ -549,8 +549,10 @@ static NSUInteger globalOrderOfArrival = 1;
 
 	kmGLPushMatrix();
 
-	if ( _grid && _grid.active)
+	if ( _grid && _grid.active) {
 		[_grid beforeDraw];
+		[self transformAncestors];
+	}
 
 	[self transform];
 
